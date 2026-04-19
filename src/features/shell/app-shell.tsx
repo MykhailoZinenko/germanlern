@@ -11,7 +11,7 @@ import { FeedbackButton } from '#/features/shell/feedback-button'
 
 export function AppShell() {
   return (
-    <SidebarProvider style={{ "--sidebar-width": "9rem" } as React.CSSProperties}>
+    <SidebarProvider>
       <AppSidebar />
       <div className="flex flex-1 flex-col">
         <AppTopbar />
