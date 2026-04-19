@@ -18,6 +18,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as SandboxRegistryRouteImport } from './routes/sandbox/registry'
+import { Route as SandboxExplorerRouteImport } from './routes/sandbox/explorer'
 import { Route as AuthOauthRouteImport } from './routes/auth/oauth'
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
@@ -74,6 +75,11 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
 const SandboxRegistryRoute = SandboxRegistryRouteImport.update({
   id: '/sandbox/registry',
   path: '/sandbox/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SandboxExplorerRoute = SandboxExplorerRouteImport.update({
+  id: '/sandbox/explorer',
+  path: '/sandbox/explorer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthOauthRoute = AuthOauthRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/explorer': typeof SandboxExplorerRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
   '/documents/$id': typeof ProtectedDocumentsIdRoute
   '/read/$id': typeof ProtectedReadIdRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/explorer': typeof SandboxExplorerRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
   '/': typeof ProtectedIndexRoute
   '/documents/$id': typeof ProtectedDocumentsIdRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/explorer': typeof SandboxExplorerRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/documents/$id': typeof ProtectedDocumentsIdRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
+    | '/sandbox/explorer'
     | '/sandbox/registry'
     | '/documents/$id'
     | '/read/$id'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
+    | '/sandbox/explorer'
     | '/sandbox/registry'
     | '/'
     | '/documents/$id'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
+    | '/sandbox/explorer'
     | '/sandbox/registry'
     | '/_protected/'
     | '/_protected/documents/$id'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   AuthConfirmRoute: typeof AuthConfirmRoute
   AuthErrorRoute: typeof AuthErrorRoute
   AuthOauthRoute: typeof AuthOauthRoute
+  SandboxExplorerRoute: typeof SandboxExplorerRoute
   SandboxRegistryRoute: typeof SandboxRegistryRoute
 }
 
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/sandbox/registry'
       fullPath: '/sandbox/registry'
       preLoaderRoute: typeof SandboxRegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sandbox/explorer': {
+      id: '/sandbox/explorer'
+      path: '/sandbox/explorer'
+      fullPath: '/sandbox/explorer'
+      preLoaderRoute: typeof SandboxExplorerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/oauth': {
@@ -502,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthConfirmRoute: AuthConfirmRoute,
   AuthErrorRoute: AuthErrorRoute,
   AuthOauthRoute: AuthOauthRoute,
+  SandboxExplorerRoute: SandboxExplorerRoute,
   SandboxRegistryRoute: SandboxRegistryRoute,
 }
 export const routeTree = rootRouteImport
