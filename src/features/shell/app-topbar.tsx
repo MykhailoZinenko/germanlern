@@ -12,9 +12,10 @@ export function AppTopbar({ title = 'GermanLern' }: { title?: string }) {
       <Button
         id="btn-add-words"
         size="sm"
+        className="md:h-[var(--shell-topbar-btn-h)] md:w-[var(--shell-topbar-btn-w)] md:rounded-xl md:text-lg"
         onClick={() => toast('Coming soon')}
       >
-        <Plus className="size-4" />
+        <Plus className="size-4 md:size-5" />
         Add words
       </Button>
     </header>

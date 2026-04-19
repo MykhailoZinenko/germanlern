@@ -121,6 +121,8 @@
   --shell-topbar-h-mobile: 48px;
   --shell-bottomnav-h: 56px;
   --shell-nav-indicator: 3px;
+  --shell-topbar-btn-h: 53px;
+  --shell-topbar-btn-w: 228px;
 
   /* ── Shadows ── */
   --shadow-sm: 0 2px 8px rgba(60, 50, 30, 0.08);
