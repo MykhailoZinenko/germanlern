@@ -9,8 +9,7 @@ const confirmFn = createServerFn({ method: 'GET' })
     if (
       searchParams &&
       typeof searchParams === 'object' &&
-      'code' in searchParams &&
-      'next' in searchParams
+      'code' in searchParams
     ) {
       return searchParams
     }
