@@ -14,7 +14,7 @@ export function AppShell() {
       <AppSidebar />
       <SidebarInset>
         <AppTopbar />
-        <div className="flex-1 p-[var(--space-4)] pb-20 md:p-[var(--space-5)] md:pb-[var(--space-5)]">
+        <div className="flex-1 p-[var(--space-4)] pb-[calc(var(--shell-bottomnav-h)+var(--space-4))] md:p-[var(--space-5)] md:pb-[var(--space-5)]">
           <Outlet />
         </div>
       </SidebarInset>

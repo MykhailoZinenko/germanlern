@@ -116,6 +116,12 @@
   --space-8: 32px;
   --space-10: 40px;
 
+  /* ── Shell Layout ── */
+  --shell-topbar-h: 84px;
+  --shell-topbar-h-mobile: 48px;
+  --shell-bottomnav-h: 56px;
+  --shell-nav-indicator: 3px;
+
   /* ── Shadows ── */
   --shadow-sm: 0 2px 8px rgba(60, 50, 30, 0.08);
   --shadow-md: 0 4px 20px rgba(60, 50, 30, 0.12);
