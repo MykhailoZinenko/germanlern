@@ -17,40 +17,53 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - [x] Supabase MCP + shadcn MCP configured
 - [x] 3D companion rendering (fur shells, animations, shaders)
 - [x] Component registry at /sandbox/registry
+- [x] Wireframe explorer at /sandbox/explorer
 - [x] CLAUDE.md, ADD.md, DD.md, CODING_RULES.md
+- [x] File naming unified to kebab-case
+- [x] Routes renamed: /sign-up → /register
 
 ---
 
-## Phase 1 — Database & Auth
+## Phase 1 — Database & Auth ✅
 
 > User can register, log in, and land on a protected shell. Data layer is ready for all features.
 
-### 1a. Database schema
-- All tables from ADD.md section 17 as Supabase migrations
-- `settings`, `words`, `word_buffer`, `review_sessions`, `review_results`, `reading_texts`, `documents`, `annotations`, `streaks`
-- RLS policies on every table (`user_id = auth.uid()`)
-- Supabase Storage bucket (private, signed URLs)
+### 1a. Database schema ✅
+- [x] Supabase CLI initialized, 10 migration files in `supabase/migrations/`
+- [x] 17 tables from ADD.md section 17 (profiles, settings, words, user_tags, word_user_tags, word_buffer, study_sessions, study_results, streaks, reading_texts, reading_word_events, documents, document_images, annotations, document_word_events, feature_events, feedback)
+- [x] `profiles` + `settings` auto-created via trigger on `auth.users` insert
+- [x] RLS policies on every table (`user_id = auth.uid()`)
+- [x] Performance indexes on all key query paths
+- [x] 4 dashboard views (user_daily_stats, user_total_stats, words_due_today, word_stage_breakdown)
+- [x] Supabase Storage bucket `user-files` (private, signed URLs, user-scoped RLS)
+- [x] TypeScript types generated at `src/types/database.ts`
 
-### 1b. Auth flow
-- Wire up existing Supabase auth blocks (login-form, sign-up-form, forgot-password, update-password)
-- Google OAuth configuration (Supabase dashboard + social-auth block)
-- OTP email verification on register
-- Protected route guard (`_authed.tsx` layout with `beforeLoad`)
-- Redirect: unauthenticated → `/login`, authenticated → `/`
-- Session persistence (stays logged in)
+### 1b. Auth flow ✅
+- [x] Wired existing Supabase auth blocks (login-form, register-form, forgot-password, update-password)
+- [x] Google OAuth (Supabase dashboard + Google Cloud Console + social-auth component)
+- [x] OTP email verification on register (emailRedirectTo → /auth/confirm?next=/onboarding)
+- [x] Protected route guard (`_protected.tsx` layout with `beforeLoad`, 5min staleTime cache)
+- [x] Redirect: unauthenticated → `/login`, authenticated → `/`
+- [x] Authenticated users redirected away from auth pages (requireAnonymous guard)
+- [x] OAuth callback validator fixed (next param optional)
+- [x] Session persistence via `@supabase/ssr` cookies
 
-### 1c. App shell
-- Root layout with sidebar (desktop) + bottom nav (mobile)
-- Navigation: Dashboard, Words, Study, Read, Documents, Settings, Profile
-- Sidebar shows streak count + total words (placeholder data for now)
-- "+Add words" CTA button in topbar
-- Companion mini placeholder (80×80 circle, bottom-right, pulsing dot)
-- Feedback button (floating, every page)
-- All route files created as stubs per ADD.md section 18
+### 1c. App shell ✅
+- [x] App shell layout with SidebarProvider + SidebarInset (shadcn components)
+- [x] Desktop sidebar (collapsible=none, 256px) with 7 nav items + streak/words footer
+- [x] Mobile bottom nav (5 items, text-only labels)
+- [x] Topbar with page title + "+Add words" CTA button
+- [x] Sidebar header aligned with topbar height
+- [x] Companion mini placeholder (80×80 circle, pulsing dot, bottom-right)
+- [x] Feedback button (floating, DD.md tokens)
+- [x] All sizes scaled from wireframes (×1.756 desktop, ×1.1 mobile) with CSS variable tokens
+- [x] Universal breakpoint: 1024px (lg:)
+- [x] All route stubs created per ADD.md section 18 with Empty state
+- [x] Wireframe methodology documented in CODING_RULES.md
 
 ---
 
-## Phase 2 — Word Pipeline
+## Phase 2 — Word Pipeline ← NEXT
 
 > User can add words, verify them with AI, and browse their library.
 
@@ -73,8 +86,8 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - List view + card view with toggle (ToggleGroup)
 - Chip component wrapping Badge for all presets (gender, type, stage, tags, due)
 - Word detail: desktop split panel, mobile full page
-- Search: fuzzy dual-language (German + Indonesian)
-- Filters: stage, word type, tags
+- Search: full-text via PostgreSQL tsvector (German + Indonesian)
+- Filters: stage, word type, tags, verification source
 - Sort: A→Z, date added, stage, last reviewed, next review
 
 ---
@@ -93,7 +106,7 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - Study configure page with bookmark tabs (Auto / By tag / Ask companion)
 - Auto: start immediately with SM-2 queue
 - By tag: tag selection via Command/Combobox, filtered session
-- Ask companion: text input → server function → AI maps to word set (deferred until companion chat in Phase 5)
+- Ask companion: text input → server function → AI maps to word set (deferred until companion chat in Phase 6)
 
 ### 3c. Exercise UI
 - Single choice (4 options, tap one)
@@ -127,7 +140,7 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - Known words: dotted underline (`--word-in-library` color)
 - Tap word → popover (desktop) / bottom sheet (mobile): translation, type, gender, stage, "Add to buffer"
 - Tap sentence → popup: German + Indonesian translation, "Add distinct words to buffer"
-- Server functions: `translate-word`, `mine-vocabulary`
+- Server functions: `translateWord`, `mineVocabulary`
 - Buffer badge in reader topbar
 - Words go to buffer silently, verified later by normal flow
 
@@ -225,7 +238,7 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - Spotlight cutout (`box-shadow: 0 0 0 9999px rgba(0,0,0,0.55)`)
 - 7 steps targeting nav items + companion area
 - Companion avatar + title + body + step counter + prev/next
-- `tourCompleted` in localStorage, never repeats
+- `tour_completed` in settings table, never repeats
 
 ### 8c. Settings page
 - Target language selector
@@ -264,4 +277,4 @@ Each phase is a deployable increment. Later phases depend on earlier ones.
 - Test with 2-3 people
 - Fix critical bugs
 - Privacy policy one-pager
-- Gift delivery 🎁
+- Gift delivery
