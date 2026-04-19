@@ -15,5 +15,6 @@ export const Route = createFileRoute('/_protected')({
       user,
     }
   },
+  staleTime: 5 * 60 * 1000,
   component: AppShell,
 })

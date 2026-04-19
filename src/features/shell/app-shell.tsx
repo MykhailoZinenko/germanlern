@@ -1,7 +1,6 @@
-import type React from 'react'
 import { Outlet } from '@tanstack/react-router'
 
-import { SidebarProvider } from '#/components/ui/sidebar'
+import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Toaster } from '#/components/ui/sonner'
 import { AppSidebar } from '#/features/shell/app-sidebar'
 import { AppTopbar } from '#/features/shell/app-topbar'
@@ -13,12 +12,12 @@ export function AppShell() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className="flex flex-1 flex-col">
+      <SidebarInset>
         <AppTopbar />
-        <main className="flex-1 p-[var(--space-4)] pb-20 md:p-[var(--space-5)] md:pb-[var(--space-5)]">
+        <div className="flex-1 p-[var(--space-4)] pb-20 md:p-[var(--space-5)] md:pb-[var(--space-5)]">
           <Outlet />
-        </main>
-      </div>
+        </div>
+      </SidebarInset>
       <AppBottomNav />
       <CompanionMini />
       <FeedbackButton />
