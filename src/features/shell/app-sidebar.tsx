@@ -27,8 +27,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="none" className="hidden !h-auto md:flex">
-      <SidebarHeader className="px-[var(--space-3)] pb-[var(--space-6)] pt-[var(--space-5)]">
-        <div className="rounded-xl bg-sidebar-accent px-[var(--space-3)] py-[var(--space-3)] text-center text-lg font-medium text-sidebar-foreground">
+      <SidebarHeader className="flex h-[var(--shell-topbar-h)] items-center justify-center border-b border-sidebar-border px-[var(--space-3)]">
+        <div className="rounded-xl bg-sidebar-accent px-[var(--space-3)] py-[var(--space-2)] text-center text-lg font-medium text-sidebar-foreground">
           GermanLern
         </div>
       </SidebarHeader>
