@@ -15,7 +15,7 @@ export function CompanionScene({
   const animation = controlledAnimation ?? localAnimation
 
   return (
-    <div className={className ?? 'h-screen w-screen'} style={{ position: 'relative' }}>
+    <div className={`relative ${className ?? 'h-screen w-screen'}`}>
       <Canvas
         camera={{ position: [0, 0.5, 3], fov: 35 }}
         gl={{ antialias: true, alpha: true }}

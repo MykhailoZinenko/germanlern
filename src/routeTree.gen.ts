@@ -9,12 +9,52 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UpdatePasswordRouteImport } from './routes/update-password'
+import { Route as SignUpSuccessRouteImport } from './routes/sign-up-success'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SandboxRegistryRouteImport } from './routes/sandbox/registry'
+import { Route as AuthOauthRouteImport } from './routes/auth/oauth'
+import { Route as AuthErrorRouteImport } from './routes/auth/error'
+import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
+import { Route as ProtectedProtectedRouteImport } from './routes/_protected/protected'
 
+const UpdatePasswordRoute = UpdatePasswordRouteImport.update({
+  id: '/update-password',
+  path: '/update-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpSuccessRoute = SignUpSuccessRouteImport.update({
+  id: '/sign-up-success',
+  path: '/sign-up-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +62,186 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SandboxRegistryRoute = SandboxRegistryRouteImport.update({
+  id: '/sandbox/registry',
+  path: '/sandbox/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthOauthRoute = AuthOauthRouteImport.update({
+  id: '/auth/oauth',
+  path: '/auth/oauth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/auth/error',
+  path: '/auth/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/auth/confirm',
+  path: '/auth/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedProtectedRoute = ProtectedProtectedRouteImport.update({
+  id: '/protected',
+  path: '/protected',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/sign-up': typeof SignUpRoute
+  '/sign-up-success': typeof SignUpSuccessRoute
+  '/update-password': typeof UpdatePasswordRoute
+  '/protected': typeof ProtectedProtectedRoute
+  '/auth/confirm': typeof AuthConfirmRoute
+  '/auth/error': typeof AuthErrorRoute
+  '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/registry': typeof SandboxRegistryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/sign-up': typeof SignUpRoute
+  '/sign-up-success': typeof SignUpSuccessRoute
+  '/update-password': typeof UpdatePasswordRoute
+  '/protected': typeof ProtectedProtectedRoute
+  '/auth/confirm': typeof AuthConfirmRoute
+  '/auth/error': typeof AuthErrorRoute
+  '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/registry': typeof SandboxRegistryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteWithChildren
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/sign-up': typeof SignUpRoute
+  '/sign-up-success': typeof SignUpSuccessRoute
+  '/update-password': typeof UpdatePasswordRoute
+  '/_protected/protected': typeof ProtectedProtectedRoute
+  '/auth/confirm': typeof AuthConfirmRoute
+  '/auth/error': typeof AuthErrorRoute
+  '/auth/oauth': typeof AuthOauthRoute
+  '/sandbox/registry': typeof SandboxRegistryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/forgot-password'
+    | '/login'
+    | '/sign-up'
+    | '/sign-up-success'
+    | '/update-password'
+    | '/protected'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/auth/oauth'
+    | '/sandbox/registry'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | '/'
+    | '/about'
+    | '/forgot-password'
+    | '/login'
+    | '/sign-up'
+    | '/sign-up-success'
+    | '/update-password'
+    | '/protected'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/auth/oauth'
+    | '/sandbox/registry'
+  id:
+    | '__root__'
+    | '/'
+    | '/_protected'
+    | '/about'
+    | '/forgot-password'
+    | '/login'
+    | '/sign-up'
+    | '/sign-up-success'
+    | '/update-password'
+    | '/_protected/protected'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/auth/oauth'
+    | '/sandbox/registry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  SignUpRoute: typeof SignUpRoute
+  SignUpSuccessRoute: typeof SignUpSuccessRoute
+  UpdatePasswordRoute: typeof UpdatePasswordRoute
+  AuthConfirmRoute: typeof AuthConfirmRoute
+  AuthErrorRoute: typeof AuthErrorRoute
+  AuthOauthRoute: typeof AuthOauthRoute
+  SandboxRegistryRoute: typeof SandboxRegistryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/update-password': {
+      id: '/update-password'
+      path: '/update-password'
+      fullPath: '/update-password'
+      preLoaderRoute: typeof UpdatePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up-success': {
+      id: '/sign-up-success'
+      path: '/sign-up-success'
+      fullPath: '/sign-up-success'
+      preLoaderRoute: typeof SignUpSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +251,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sandbox/registry': {
+      id: '/sandbox/registry'
+      path: '/sandbox/registry'
+      fullPath: '/sandbox/registry'
+      preLoaderRoute: typeof SandboxRegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/oauth': {
+      id: '/auth/oauth'
+      path: '/auth/oauth'
+      fullPath: '/auth/oauth'
+      preLoaderRoute: typeof AuthOauthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/auth/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/confirm': {
+      id: '/auth/confirm'
+      path: '/auth/confirm'
+      fullPath: '/auth/confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/protected': {
+      id: '/_protected/protected'
+      path: '/protected'
+      fullPath: '/protected'
+      preLoaderRoute: typeof ProtectedProtectedRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
 
+interface ProtectedRouteChildren {
+  ProtectedProtectedRoute: typeof ProtectedProtectedRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedProtectedRoute: ProtectedProtectedRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
   AboutRoute: AboutRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  SignUpRoute: SignUpRoute,
+  SignUpSuccessRoute: SignUpSuccessRoute,
+  UpdatePasswordRoute: UpdatePasswordRoute,
+  AuthConfirmRoute: AuthConfirmRoute,
+  AuthErrorRoute: AuthErrorRoute,
+  AuthOauthRoute: AuthOauthRoute,
+  SandboxRegistryRoute: SandboxRegistryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
