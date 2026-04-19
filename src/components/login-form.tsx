@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { cn } from '#/lib/utils'
 import { createClient } from '#/lib/supabase/client'
+import { GoogleSignInButton } from '#/components/social-auth'
 import { Button } from '#/components/ui/button'
 import {
   Card,
@@ -34,7 +35,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      await navigate({ to: '/protected' })
+      await navigate({ to: '/' })
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -50,7 +51,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <div className="flex flex-col gap-6">
+            <GoogleSignInButton />
+            <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+              <span className="relative z-10 bg-card px-2 text-muted-foreground">
+                or continue with email
+              </span>
+            </div>
+          </div>
+          <form onSubmit={handleLogin} className="mt-6">
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

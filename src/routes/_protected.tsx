@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { fetchUser } from '#/lib/supabase/fetch-user-server-fn'
+import { AppShell } from '#/features/shell/app-shell'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async () => {
@@ -14,4 +15,5 @@ export const Route = createFileRoute('/_protected')({
       user,
     }
   },
+  component: AppShell,
 })

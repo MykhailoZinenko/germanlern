@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { cn } from '#/lib/utils'
 import { createClient } from '#/lib/supabase/client'
+import { GoogleSignInButton } from '#/components/social-auth'
 import { Button } from '#/components/ui/button'
 import {
   Card,
@@ -38,7 +39,7 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/onboarding`,
         },
       })
       if (error) throw error
@@ -58,7 +59,15 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
           <CardDescription>Create a new account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignUp}>
+          <div className="flex flex-col gap-6">
+            <GoogleSignInButton />
+            <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+              <span className="relative z-10 bg-card px-2 text-muted-foreground">
+                or continue with email
+              </span>
+            </div>
+          </div>
+          <form onSubmit={handleSignUp} className="mt-6">
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

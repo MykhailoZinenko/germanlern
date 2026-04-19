@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { ForgotPasswordForm } from '#/components/forgot-password-form'
+import { requireAnonymous } from '#/lib/supabase/require-anonymous'
 
 export const Route = createFileRoute('/forgot-password')({
+  beforeLoad: requireAnonymous,
   component: ForgotPassword,
 })
 

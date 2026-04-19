@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { LoginForm } from '#/components/login-form'
+import { requireAnonymous } from '#/lib/supabase/require-anonymous'
 
 export const Route = createFileRoute('/login')({
+  beforeLoad: requireAnonymous,
   component: Login,
 })
 

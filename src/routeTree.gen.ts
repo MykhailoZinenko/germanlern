@@ -12,16 +12,25 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UpdatePasswordRouteImport } from './routes/update-password'
 import { Route as RegisterSuccessRouteImport } from './routes/register-success'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as ProtectedRouteImport } from './routes/_protected'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as SandboxRegistryRouteImport } from './routes/sandbox/registry'
 import { Route as AuthOauthRouteImport } from './routes/auth/oauth'
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
-import { Route as ProtectedProtectedRouteImport } from './routes/_protected/protected'
+import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
+import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
+import { Route as ProtectedWordsIndexRouteImport } from './routes/_protected/words/index'
+import { Route as ProtectedStudyIndexRouteImport } from './routes/_protected/study/index'
+import { Route as ProtectedReadIndexRouteImport } from './routes/_protected/read/index'
+import { Route as ProtectedDocumentsIndexRouteImport } from './routes/_protected/documents/index'
+import { Route as ProtectedWordsIdRouteImport } from './routes/_protected/words/$id'
+import { Route as ProtectedStudySessionRouteImport } from './routes/_protected/study/session'
+import { Route as ProtectedReadIdRouteImport } from './routes/_protected/read/$id'
+import { Route as ProtectedDocumentsIdRouteImport } from './routes/_protected/documents/$id'
 
 const UpdatePasswordRoute = UpdatePasswordRouteImport.update({
   id: '/update-password',
@@ -38,6 +47,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -48,19 +62,14 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const SandboxRegistryRoute = SandboxRegistryRouteImport.update({
   id: '/sandbox/registry',
@@ -82,108 +91,206 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedProtectedRoute = ProtectedProtectedRouteImport.update({
-  id: '/protected',
-  path: '/protected',
+const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedWordsIndexRoute = ProtectedWordsIndexRouteImport.update({
+  id: '/words/',
+  path: '/words/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedStudyIndexRoute = ProtectedStudyIndexRouteImport.update({
+  id: '/study/',
+  path: '/study/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedReadIndexRoute = ProtectedReadIndexRouteImport.update({
+  id: '/read/',
+  path: '/read/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedDocumentsIndexRoute = ProtectedDocumentsIndexRouteImport.update({
+  id: '/documents/',
+  path: '/documents/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedWordsIdRoute = ProtectedWordsIdRouteImport.update({
+  id: '/words/$id',
+  path: '/words/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedStudySessionRoute = ProtectedStudySessionRouteImport.update({
+  id: '/study/session',
+  path: '/study/session',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedReadIdRoute = ProtectedReadIdRouteImport.update({
+  id: '/read/$id',
+  path: '/read/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedDocumentsIdRoute = ProtectedDocumentsIdRouteImport.update({
+  id: '/documents/$id',
+  path: '/documents/$id',
   getParentRoute: () => ProtectedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/': typeof ProtectedIndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/protected': typeof ProtectedProtectedRoute
+  '/profile': typeof ProtectedProfileRoute
+  '/settings': typeof ProtectedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
+  '/documents/$id': typeof ProtectedDocumentsIdRoute
+  '/read/$id': typeof ProtectedReadIdRoute
+  '/study/session': typeof ProtectedStudySessionRoute
+  '/words/$id': typeof ProtectedWordsIdRoute
+  '/documents/': typeof ProtectedDocumentsIndexRoute
+  '/read/': typeof ProtectedReadIndexRoute
+  '/study/': typeof ProtectedStudyIndexRoute
+  '/words/': typeof ProtectedWordsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/protected': typeof ProtectedProtectedRoute
+  '/profile': typeof ProtectedProfileRoute
+  '/settings': typeof ProtectedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
+  '/': typeof ProtectedIndexRoute
+  '/documents/$id': typeof ProtectedDocumentsIdRoute
+  '/read/$id': typeof ProtectedReadIdRoute
+  '/study/session': typeof ProtectedStudySessionRoute
+  '/words/$id': typeof ProtectedWordsIdRoute
+  '/documents': typeof ProtectedDocumentsIndexRoute
+  '/read': typeof ProtectedReadIndexRoute
+  '/study': typeof ProtectedStudyIndexRoute
+  '/words': typeof ProtectedWordsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
-  '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/_protected/protected': typeof ProtectedProtectedRoute
+  '/_protected/profile': typeof ProtectedProfileRoute
+  '/_protected/settings': typeof ProtectedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/oauth': typeof AuthOauthRoute
   '/sandbox/registry': typeof SandboxRegistryRoute
+  '/_protected/': typeof ProtectedIndexRoute
+  '/_protected/documents/$id': typeof ProtectedDocumentsIdRoute
+  '/_protected/read/$id': typeof ProtectedReadIdRoute
+  '/_protected/study/session': typeof ProtectedStudySessionRoute
+  '/_protected/words/$id': typeof ProtectedWordsIdRoute
+  '/_protected/documents/': typeof ProtectedDocumentsIndexRoute
+  '/_protected/read/': typeof ProtectedReadIndexRoute
+  '/_protected/study/': typeof ProtectedStudyIndexRoute
+  '/_protected/words/': typeof ProtectedWordsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/register-success'
     | '/update-password'
-    | '/protected'
+    | '/profile'
+    | '/settings'
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
     | '/sandbox/registry'
+    | '/documents/$id'
+    | '/read/$id'
+    | '/study/session'
+    | '/words/$id'
+    | '/documents/'
+    | '/read/'
+    | '/study/'
+    | '/words/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/about'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/register-success'
     | '/update-password'
-    | '/protected'
+    | '/profile'
+    | '/settings'
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
     | '/sandbox/registry'
+    | '/'
+    | '/documents/$id'
+    | '/read/$id'
+    | '/study/session'
+    | '/words/$id'
+    | '/documents'
+    | '/read'
+    | '/study'
+    | '/words'
   id:
     | '__root__'
-    | '/'
     | '/_protected'
-    | '/about'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/register-success'
     | '/update-password'
-    | '/_protected/protected'
+    | '/_protected/profile'
+    | '/_protected/settings'
     | '/auth/confirm'
     | '/auth/error'
     | '/auth/oauth'
     | '/sandbox/registry'
+    | '/_protected/'
+    | '/_protected/documents/$id'
+    | '/_protected/read/$id'
+    | '/_protected/study/session'
+    | '/_protected/words/$id'
+    | '/_protected/documents/'
+    | '/_protected/read/'
+    | '/_protected/study/'
+    | '/_protected/words/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
-  AboutRoute: typeof AboutRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RegisterRoute: typeof RegisterRoute
   RegisterSuccessRoute: typeof RegisterSuccessRoute
   UpdatePasswordRoute: typeof UpdatePasswordRoute
@@ -216,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -230,13 +344,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -244,12 +351,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_protected/': {
+      id: '/_protected/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/sandbox/registry': {
       id: '/sandbox/registry'
@@ -279,22 +386,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/protected': {
-      id: '/_protected/protected'
-      path: '/protected'
-      fullPath: '/protected'
-      preLoaderRoute: typeof ProtectedProtectedRouteImport
+    '/_protected/settings': {
+      id: '/_protected/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof ProtectedSettingsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/words/': {
+      id: '/_protected/words/'
+      path: '/words'
+      fullPath: '/words/'
+      preLoaderRoute: typeof ProtectedWordsIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/study/': {
+      id: '/_protected/study/'
+      path: '/study'
+      fullPath: '/study/'
+      preLoaderRoute: typeof ProtectedStudyIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/read/': {
+      id: '/_protected/read/'
+      path: '/read'
+      fullPath: '/read/'
+      preLoaderRoute: typeof ProtectedReadIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/documents/': {
+      id: '/_protected/documents/'
+      path: '/documents'
+      fullPath: '/documents/'
+      preLoaderRoute: typeof ProtectedDocumentsIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/words/$id': {
+      id: '/_protected/words/$id'
+      path: '/words/$id'
+      fullPath: '/words/$id'
+      preLoaderRoute: typeof ProtectedWordsIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/study/session': {
+      id: '/_protected/study/session'
+      path: '/study/session'
+      fullPath: '/study/session'
+      preLoaderRoute: typeof ProtectedStudySessionRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/read/$id': {
+      id: '/_protected/read/$id'
+      path: '/read/$id'
+      fullPath: '/read/$id'
+      preLoaderRoute: typeof ProtectedReadIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/documents/$id': {
+      id: '/_protected/documents/$id'
+      path: '/documents/$id'
+      fullPath: '/documents/$id'
+      preLoaderRoute: typeof ProtectedDocumentsIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
   }
 }
 
 interface ProtectedRouteChildren {
-  ProtectedProtectedRoute: typeof ProtectedProtectedRoute
+  ProtectedProfileRoute: typeof ProtectedProfileRoute
+  ProtectedSettingsRoute: typeof ProtectedSettingsRoute
+  ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedDocumentsIdRoute: typeof ProtectedDocumentsIdRoute
+  ProtectedReadIdRoute: typeof ProtectedReadIdRoute
+  ProtectedStudySessionRoute: typeof ProtectedStudySessionRoute
+  ProtectedWordsIdRoute: typeof ProtectedWordsIdRoute
+  ProtectedDocumentsIndexRoute: typeof ProtectedDocumentsIndexRoute
+  ProtectedReadIndexRoute: typeof ProtectedReadIndexRoute
+  ProtectedStudyIndexRoute: typeof ProtectedStudyIndexRoute
+  ProtectedWordsIndexRoute: typeof ProtectedWordsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedProtectedRoute: ProtectedProtectedRoute,
+  ProtectedProfileRoute: ProtectedProfileRoute,
+  ProtectedSettingsRoute: ProtectedSettingsRoute,
+  ProtectedIndexRoute: ProtectedIndexRoute,
+  ProtectedDocumentsIdRoute: ProtectedDocumentsIdRoute,
+  ProtectedReadIdRoute: ProtectedReadIdRoute,
+  ProtectedStudySessionRoute: ProtectedStudySessionRoute,
+  ProtectedWordsIdRoute: ProtectedWordsIdRoute,
+  ProtectedDocumentsIndexRoute: ProtectedDocumentsIndexRoute,
+  ProtectedReadIndexRoute: ProtectedReadIndexRoute,
+  ProtectedStudyIndexRoute: ProtectedStudyIndexRoute,
+  ProtectedWordsIndexRoute: ProtectedWordsIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -302,11 +492,10 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
-  AboutRoute: AboutRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RegisterRoute: RegisterRoute,
   RegisterSuccessRoute: RegisterSuccessRoute,
   UpdatePasswordRoute: UpdatePasswordRoute,
