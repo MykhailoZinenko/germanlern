@@ -5,8 +5,8 @@ import { Button } from '#/components/ui/button'
 
 export function AppTopbar({ title = 'GermanLern' }: { title?: string }) {
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--surface-sunken)] px-4 md:px-5">
-      <span className="text-xs font-medium text-[var(--text-primary)] md:text-sm">
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--surface-sunken)] px-[var(--space-4)] md:px-[var(--space-5)]">
+      <span className="text-sm font-medium text-[var(--text-primary)]">
         {title}
       </span>
       <Button

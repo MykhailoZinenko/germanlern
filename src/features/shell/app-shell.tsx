@@ -15,7 +15,7 @@ export function AppShell() {
       <AppSidebar />
       <div className="flex flex-1 flex-col">
         <AppTopbar />
-        <main className="flex-1 p-[var(--space-4)] pb-16 md:p-[var(--space-5)]">
+        <main className="flex-1 p-[var(--space-4)] pb-20 md:p-[var(--space-5)] md:pb-[var(--space-5)]">
           <Outlet />
         </main>
       </div>

@@ -8,7 +8,7 @@ export function FeedbackButton() {
     <Button
       variant="outline"
       size="icon"
-      className="fixed bottom-36 right-4 z-40 border-[var(--feedback-border)] bg-[var(--feedback-bg)] text-[var(--feedback-text)] hover:bg-[var(--feedback-hover)] md:bottom-20 md:right-6"
+      className="fixed bottom-[calc(4rem+var(--space-4)+5rem+var(--space-2))] right-[var(--space-4)] z-40 border-[var(--feedback-border)] bg-[var(--feedback-bg)] text-[var(--feedback-text)] hover:bg-[var(--feedback-hover)] md:bottom-[calc(var(--space-6)+5rem+var(--space-2))] md:right-[var(--space-6)]"
       onClick={() => toast('Feedback coming soon')}
     >
       <MessageSquare className="size-4" />

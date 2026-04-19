@@ -28,7 +28,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="none" className="hidden !h-auto md:flex">
       <SidebarHeader>
-        <div className="rounded-lg border border-sidebar-border bg-sidebar-accent px-3 py-2 text-center text-xs font-semibold text-sidebar-foreground">
+        <div className="rounded-md border border-sidebar-border bg-sidebar-accent px-[var(--space-3)] py-[var(--space-2)] text-center text-sm font-semibold text-sidebar-foreground">
           GermanLern
         </div>
       </SidebarHeader>
@@ -53,11 +53,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex flex-col gap-1.5 px-2 py-2">
-          <div className="text-[8px] uppercase tracking-widest text-[var(--text-faint)]">Streak</div>
-          <div className="text-base font-medium text-[var(--text-muted)]">0 days</div>
-          <div className="mt-1 text-[8px] uppercase tracking-widest text-[var(--text-faint)]">Words</div>
-          <div className="text-base font-medium text-[var(--text-muted)]">0</div>
+        <div className="flex flex-col gap-[var(--space-1)] px-[var(--space-2)] py-[var(--space-3)]">
+          <div className="text-xs uppercase tracking-widest text-[var(--text-faint)]">Streak</div>
+          <div className="text-xl font-medium text-[var(--text-muted)]">0 days</div>
+          <div className="mt-[var(--space-1)] text-xs uppercase tracking-widest text-[var(--text-faint)]">Words</div>
+          <div className="text-xl font-medium text-[var(--text-muted)]">0</div>
         </div>
       </SidebarFooter>
     </Sidebar>
