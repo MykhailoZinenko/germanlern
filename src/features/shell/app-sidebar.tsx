@@ -28,7 +28,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="none" className="hidden !h-auto md:flex">
       <SidebarHeader>
-        <div className="rounded-md border border-sidebar-border bg-sidebar-accent px-[var(--space-3)] py-[var(--space-2)] text-center text-sm font-semibold text-sidebar-foreground">
+        <div className="rounded-md border border-sidebar-border bg-sidebar-accent px-[var(--space-3)] py-[var(--space-2)] text-center text-lg font-semibold text-sidebar-foreground">
           GermanLern
         </div>
       </SidebarHeader>
@@ -41,6 +41,7 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={!!matchRoute({ to: item.path, fuzzy: item.path !== '/' })}
+                    className="text-lg"
                   >
                     <Link to={item.path}>
                       <span>{item.label}</span>
@@ -53,11 +54,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex flex-col gap-[var(--space-1)] px-[var(--space-2)] py-[var(--space-3)]">
-          <div className="text-xs uppercase tracking-widest text-[var(--text-faint)]">Streak</div>
-          <div className="text-xl font-medium text-[var(--text-muted)]">0 days</div>
-          <div className="mt-[var(--space-1)] text-xs uppercase tracking-widest text-[var(--text-faint)]">Words</div>
-          <div className="text-xl font-medium text-[var(--text-muted)]">0</div>
+        <div className="flex flex-col gap-[var(--space-1)] px-[var(--space-3)] py-[var(--space-3)]">
+          <div className="text-sm uppercase tracking-widest text-[var(--text-faint)]">Streak</div>
+          <div className="text-2xl font-medium text-[var(--text-muted)]">0 days</div>
+          <div className="mt-[var(--space-2)] text-sm uppercase tracking-widest text-[var(--text-faint)]">Words</div>
+          <div className="text-2xl font-medium text-[var(--text-muted)]">0</div>
         </div>
       </SidebarFooter>
     </Sidebar>

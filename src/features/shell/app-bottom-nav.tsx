@@ -12,7 +12,7 @@ export function AppBottomNav() {
   const matchRoute = useMatchRoute()
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 flex h-16 shrink-0 items-center justify-around border-t border-[var(--border-subtle)] bg-[var(--surface-sunken)] pb-[env(safe-area-inset-bottom)] md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 flex h-14 shrink-0 items-center justify-around border-t border-[var(--border-subtle)] bg-[var(--surface-sunken)] pb-[env(safe-area-inset-bottom)] md:hidden">
       {NAV_ITEMS.map((item) => {
         const isActive = !!matchRoute({ to: item.path, fuzzy: item.path !== '/' })
         return (
