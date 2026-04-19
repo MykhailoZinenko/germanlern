@@ -35,7 +35,7 @@
 
 | Layer | Technology | Reason |
 |---|---|---|
-| Framework | TanStack Start | Built on Vite/Vinxi under the hood. Much lighter than Next.js (300-600MB dev RAM vs 1-3GB). File-based routing, server functions built in, full Vercel support. |
+| Framework | TanStack Start | Built on Vite/Vinxi. Much lighter than Next.js (300-600MB dev RAM vs 1-3GB). File-based routing, server functions (`createServerFn`) built in, full Vercel support. No separate backend needed. |
 | Routing | TanStack Router | Built into TanStack Start. File-based routing, type-safe, already familiar. |
 | Styling | Tailwind CSS | Utility-first, pairs with shadcn |
 | Component library | shadcn/ui | Flexible, unstyled base. Initialized via `npx shadcn@latest init --preset b7W7uXIuG --template vite` to bake in the pastel token set from day one. Supabase shadcn blocks used for auth and file uploads — compatible with TanStack Start. |
@@ -43,7 +43,8 @@
 | 3D Companion | Three.js | Renders custom 3D model. Model asset produced externally (sketch → Tripo3D → Blender), integrated into canvas. |
 | Rich text editor | Tiptap | Handles text + inline images in documents. Built on ProseMirror, well maintained, clean React integration. |
 | Forms | React Hook Form + Zod | Form state management + schema validation. Used for login, register, add word, settings, profile. |
-| State management | Zustand | Global state for current user, companion state, buffer word count, tour step. Simple, no boilerplate. |
+| State management | Zustand | Client state only — companion animation state, buffer word count, tour step, UI modals. No server data. |
+| Server state | TanStack Query | Server state only — fetching, caching, loading/error states, refetching from Supabase. Complements Zustand, does not replace it. |
 | Icons | Lucide | Standard for shadcn, large selection, well maintained. |
 
 ### Backend
@@ -53,7 +54,8 @@
 | Database | Supabase (PostgreSQL) | Free tier, built-in auth, built-in storage, simple migration path |
 | File storage | Supabase Storage (S3-compatible) | All files stored here. Database stores metadata and references only. |
 | AI | Gemini 2.0 Flash via Google AI Studio | Free tier, fast, capable for all AI tasks in this app |
-| AI execution | Supabase Edge Functions | All AI calls and sensitive operations run server-side via edge functions. Gemini key stored as Supabase secret, never exposed to client. Edge functions written in Deno, deployed with `supabase functions deploy`. |
+| Server functions | TanStack Start `createServerFn` | All AI calls and sensitive operations. Ships with frontend to Vercel as serverless functions. Full TypeScript end-to-end. Gemini key stored as environment variable, never exposed to client. |
+| Server state | TanStack Query | Data fetching, caching, loading/error states for all Supabase reads |
 | Hosting | Vercel | Free tier, instant deploys, custom domain when ready |
 | Error tracking | Sentry | Free tier, 5,000 errors/month, Telegram alerts |
 | Feedback | Telegram bot | User feedback and Sentry alerts via Telegram bot API |
