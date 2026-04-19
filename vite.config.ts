@@ -16,6 +16,9 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  server: {
+    allowedHosts: ["gelatinous-bounteously-malena.ngrok-free.dev"]
+  }
 })
 
 export default config
