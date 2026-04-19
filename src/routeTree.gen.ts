@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UpdatePasswordRouteImport } from './routes/update-password'
-import { Route as SignUpSuccessRouteImport } from './routes/sign-up-success'
-import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as RegisterSuccessRouteImport } from './routes/register-success'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AboutRouteImport } from './routes/about'
@@ -28,14 +28,14 @@ const UpdatePasswordRoute = UpdatePasswordRouteImport.update({
   path: '/update-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignUpSuccessRoute = SignUpSuccessRouteImport.update({
-  id: '/sign-up-success',
-  path: '/sign-up-success',
+const RegisterSuccessRoute = RegisterSuccessRouteImport.update({
+  id: '/register-success',
+  path: '/register-success',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignUpRoute = SignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -93,8 +93,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/sign-up': typeof SignUpRoute
-  '/sign-up-success': typeof SignUpSuccessRoute
+  '/register': typeof RegisterRoute
+  '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
   '/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
@@ -107,8 +107,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/sign-up': typeof SignUpRoute
-  '/sign-up-success': typeof SignUpSuccessRoute
+  '/register': typeof RegisterRoute
+  '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
   '/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
@@ -123,8 +123,8 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/sign-up': typeof SignUpRoute
-  '/sign-up-success': typeof SignUpSuccessRoute
+  '/register': typeof RegisterRoute
+  '/register-success': typeof RegisterSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
   '/_protected/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
@@ -139,8 +139,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/forgot-password'
     | '/login'
-    | '/sign-up'
-    | '/sign-up-success'
+    | '/register'
+    | '/register-success'
     | '/update-password'
     | '/protected'
     | '/auth/confirm'
@@ -153,8 +153,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/forgot-password'
     | '/login'
-    | '/sign-up'
-    | '/sign-up-success'
+    | '/register'
+    | '/register-success'
     | '/update-password'
     | '/protected'
     | '/auth/confirm'
@@ -168,8 +168,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/forgot-password'
     | '/login'
-    | '/sign-up'
-    | '/sign-up-success'
+    | '/register'
+    | '/register-success'
     | '/update-password'
     | '/_protected/protected'
     | '/auth/confirm'
@@ -184,8 +184,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
-  SignUpRoute: typeof SignUpRoute
-  SignUpSuccessRoute: typeof SignUpSuccessRoute
+  RegisterRoute: typeof RegisterRoute
+  RegisterSuccessRoute: typeof RegisterSuccessRoute
   UpdatePasswordRoute: typeof UpdatePasswordRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   AuthErrorRoute: typeof AuthErrorRoute
@@ -202,18 +202,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UpdatePasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sign-up-success': {
-      id: '/sign-up-success'
-      path: '/sign-up-success'
-      fullPath: '/sign-up-success'
-      preLoaderRoute: typeof SignUpSuccessRouteImport
+    '/register-success': {
+      id: '/register-success'
+      path: '/register-success'
+      fullPath: '/register-success'
+      preLoaderRoute: typeof RegisterSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sign-up': {
-      id: '/sign-up'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -307,8 +307,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
-  SignUpRoute: SignUpRoute,
-  SignUpSuccessRoute: SignUpSuccessRoute,
+  RegisterRoute: RegisterRoute,
+  RegisterSuccessRoute: RegisterSuccessRoute,
   UpdatePasswordRoute: UpdatePasswordRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   AuthErrorRoute: AuthErrorRoute,

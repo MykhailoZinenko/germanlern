@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '#/components/ui/card'
 
-export const Route = createFileRoute('/sign-up-success')({
+export const Route = createFileRoute('/register-success')({
   component: SignUpSuccess,
 })
 

@@ -14,7 +14,7 @@ import {
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function RegisterForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
@@ -42,7 +42,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         },
       })
       if (error) throw error
-      await navigate({ to: '/sign-up-success' })
+      await navigate({ to: '/register-success' })
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

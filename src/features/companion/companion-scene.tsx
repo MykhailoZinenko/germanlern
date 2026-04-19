@@ -1,7 +1,7 @@
 import { Suspense, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { Companion } from './Companion'
+import { Companion } from './companion'
 import type { AnimationName, CompanionSceneProps } from './types'
 
 const ANIMATIONS: AnimationName[] = ['idle', 'happy', 'wave', 'sleeping', 'walking']

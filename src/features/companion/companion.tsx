@@ -1,9 +1,9 @@
 import { useRef, useMemo, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { useCreatureGLTF } from './hooks/useCreatureGLTF'
-import { useAnimationController } from './hooks/useAnimationController'
-import { useFurPhysics } from './hooks/useFurPhysics'
-import { FurShell } from './FurShell'
+import { useCreatureGLTF } from './hooks/use-creature-gltf'
+import { useAnimationController } from './hooks/use-animation-controller'
+import { useFurPhysics } from './hooks/use-fur-physics'
+import { FurShell } from './fur-shell'
 import { BODY_FUR, POMPOM_FUR, BODY_MESH_NAME, POMPOM_MESH_NAMES } from './constants'
 import type { CompanionProps } from './types'
 

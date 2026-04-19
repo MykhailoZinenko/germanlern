@@ -1,6 +1,6 @@
-# GermanLern — Full Architecture Document
+# GermanLern — Architecture Document
 
-> A personal German vocabulary learning web app built as a surprise gift.
+> A personal German vocabulary learning web app built as a surprise gift for Cindy.
 > Every decision in this document was made through discussion — nothing invented.
 
 ---
@@ -14,14 +14,13 @@
 | Primary user | Indonesian native, learning German |
 | Source language | German |
 | Target translation language | Indonesian (configurable in settings) |
-| Auth | Email + password |
-| Database | Supabase (PostgreSQL) |
+| Database region | Supabase — Singapore (closest to Indonesia) |
 
 ---
 
 ## 2. Core Principles
 
-- **AI assists, never blocks** — all AI runs async or in batch. The user is never waiting on AI to continue her flow.
+- **AI assists, never blocks** — all AI runs via server functions, triggered async. User is never waiting.
 - **Never punish** — all results framed positively. Show what she got right. Never emphasize wrong.
 - **Single source of truth** — everything related to German learning lives here. Words, documents, reading texts, study history, progress.
 - **Warm and personal** — the companion is the emotional center of the app. It has a name, it reacts, it encourages.
@@ -35,43 +34,53 @@
 
 | Layer | Technology | Reason |
 |---|---|---|
-| Framework | TanStack Start | Built on Vite/Vinxi. Much lighter than Next.js (300-600MB dev RAM vs 1-3GB). File-based routing, server functions (`createServerFn`) built in, full Vercel support. No separate backend needed. |
-| Routing | TanStack Router | Built into TanStack Start. File-based routing, type-safe, already familiar. |
+| Framework | TanStack Start | Built on Vite/Vinxi. Much lighter than Next.js (300–600MB dev RAM vs 1–3GB). File-based routing, server functions (`createServerFn`) built in, full Vercel support. No separate backend needed. |
+| Routing | TanStack Router | Built into TanStack Start. File-based routing, type-safe, already familiar to developer. |
 | Styling | Tailwind CSS | Utility-first, pairs with shadcn |
-| Component library | shadcn/ui | Flexible, unstyled base. Initialized via `npx shadcn@latest init --preset b7W7uXIuG --template vite` to bake in the pastel token set from day one. Supabase shadcn blocks used for auth and file uploads — compatible with TanStack Start. |
-| Animations | Framer Motion | Companion animations, layout transitions, onboarding spotlight tour |
-| 3D Companion | Three.js | Renders custom 3D model. Model asset produced externally (sketch → Tripo3D → Blender), integrated into canvas. |
-| Rich text editor | Tiptap | Handles text + inline images in documents. Built on ProseMirror, well maintained, clean React integration. |
-| Forms | React Hook Form + Zod | Form state management + schema validation. Used for login, register, add word, settings, profile. |
-| State management | Zustand | Client state only — companion animation state, buffer word count, tour step, UI modals. No server data. |
-| Server state | TanStack Query | Server state only — fetching, caching, loading/error states, refetching from Supabase. Complements Zustand, does not replace it. |
-| Icons | Lucide | Standard for shadcn, large selection, well maintained. |
+| Component library | shadcn/ui | Flexible, unstyled base. Initialized via `npx shadcn@latest init --preset b7W7uXIuG --template vite` to bake in the pastel token set from day one. Supabase shadcn blocks used for auth and file uploads. |
+| Animations | Framer Motion | Layout transitions, onboarding spotlight tour, companion walk animation between states |
+| 3D Companion | Three.js | Renders custom `.glb` model. Asset produced via Tripo3D → Blender rigging → named animation actions baked in. |
+| Rich text editor | Tiptap | Handles text + inline images in documents. Built on ProseMirror. |
+| Forms | React Hook Form + Zod | Form state + schema validation for all forms. |
+| Server state | TanStack Query | All Supabase data fetching, caching, loading/error states. |
+| Client state | Zustand | UI state only — companion animation state, buffer word count, tour step, modals. |
+| Icons | Lucide | Standard for shadcn. |
 
 ### Backend
 
 | Layer | Technology | Reason |
 |---|---|---|
-| Database | Supabase (PostgreSQL) | Free tier, built-in auth, built-in storage, simple migration path |
-| File storage | Supabase Storage (S3-compatible) | All files stored here. Database stores metadata and references only. |
-| AI | Gemini 2.0 Flash via Google AI Studio | Free tier, fast, capable for all AI tasks in this app |
-| Server functions | TanStack Start `createServerFn` | All AI calls and sensitive operations. Ships with frontend to Vercel as serverless functions. Full TypeScript end-to-end. Gemini key stored as environment variable, never exposed to client. |
-| Server state | TanStack Query | Data fetching, caching, loading/error states for all Supabase reads |
-| Hosting | Vercel | Free tier, instant deploys, custom domain when ready |
-| Error tracking | Sentry | Free tier, 5,000 errors/month, Telegram alerts |
-| Feedback | Telegram bot | User feedback and Sentry alerts via Telegram bot API |
+| Database | Supabase (PostgreSQL) | Free tier, built-in auth, built-in storage, Singapore region. |
+| File storage | Supabase Storage (S3-compatible) | PDFs, images inside rich text documents. Database stores paths only. |
+| AI | Gemini 2.0 Flash (Google AI Studio) | Free tier, fast, capable for all AI tasks. |
+| Server functions | TanStack Start `createServerFn` | All AI calls and sensitive operations. Ships with frontend to Vercel as serverless functions. Gemini key in environment variable, never exposed to client. |
+| Error tracking | Sentry | Free tier, 5,000 errors/month. Alerts to Telegram. |
+| Feedback | Telegram bot | User feedback and Sentry alerts via Telegram bot API. |
+| Hosting | Vercel | Free tier, instant deploys. Custom domain when ready. |
 
-### Edge Functions (created as needed, not upfront)
+### Server Functions
+
+Created as needed. All AI calls and sensitive operations run here.
 
 | Function | Purpose |
 |---|---|
-| `verify-words` | Batch word verification, translation, tagging, grammar detection |
-| `generate-study-session` | Build all exercise questions and distractors upfront before session |
-| `companion-message` | Companion chat responses with full app context |
-| `translate-word` | Reading module word/sentence tap translations |
-| `generate-reading-text` | AI text generation for reading module |
-| `mine-vocabulary` | Extract distinct meaningful words from document selections |
+| `verifyWords` | Duplicate check → DWDS → Wiktionary → Gemini enrichment batch |
+| `generateStudySession` | Build all questions and distractors upfront before session starts |
+| `companionMessage` | Companion chat response with full app context payload |
+| `translateWord` | Reading module word tap translation |
+| `translateSentence` | Reading module sentence tap translation |
+| `generateReadingText` | AI text generation for reading module |
+| `mineVocabulary` | Extract distinct meaningful words from document selection |
+| `sendFeedback` | Post user feedback to Telegram bot |
+| `checkDictionary` | DWDS + Wiktionary lookup for word verification |
 
-New edge functions are added as new features require them. No need to plan all upfront.
+### Supabase Edge Functions
+
+Used only for database-triggered webhooks.
+
+| Function | Purpose |
+|---|---|
+| `on-new-user` | Triggered on new registration. Posts notification to Telegram. |
 
 ### Storage Structure
 
@@ -79,24 +88,19 @@ New edge functions are added as new features require them. No need to plan all u
 {user_id}/
   documents/
     {document_id}/
-      file.pdf              ← PDF uploads
+      file.pdf
       images/
-        {image_id}.jpg      ← Images embedded in rich text documents
-  reading/
-    {text_id}/
-      file.txt              ← Uploaded reading texts (if applicable)
+        {image_id}.{ext}
 ```
 
-Rich text document content (Tiptap JSON) is stored directly in the database `content` column — not in storage. Documents are study-sized (not large), so the database read is faster and simpler than a storage fetch. Images inside rich text go to storage; the Tiptap JSON stores only the URL reference.
+### Phase 2 Additions
+- Tesseract.js — OCR for camera/photo word capture
 
-### Phase 2 additions
-- Tesseract.js — OCR for camera/photo word capture (Scan mode)
-
-### Phase 3 additions
+### Phase 3 Additions
 - ElevenLabs API — voice cloning for companion voice messages
 
 ### Visual Theme
-Pastel, calm aesthetic. Baked in via shadcn preset from day one. No dark/light toggle in v1. Floral decorative layer added in v2 on top of the already-consistent base — avoids development overhead in v1 while keeping a clean, consistent look.
+Pantone Garden Party × Laura Ashley Summer fusion. Warm peach-white base, coral-to-gold word stages, Lumi wisteria-purple exclusively for companion and AI. Baked in via shadcn preset from day one. No dark mode in v1. Full design specification in `DESIGN.md`.
 
 ---
 
@@ -106,98 +110,90 @@ Pastel, calm aesthetic. Baked in via shadcn preset from day one. No dark/light t
 
 | Method | Status | Notes |
 |---|---|---|
-| Google OAuth | Primary | One click, no password, covers most users. Configured via Supabase OAuth providers. |
+| Google OAuth | Primary | One click, no password. Configured via Supabase OAuth providers. |
 | Email + password | Fallback | For users without Google. |
-| OTP via email | Passwordless option | 6-digit code sent to email. Also used for email verification on register. |
-| Password reset | Forgot password flow | `supabase.auth.resetPasswordForEmail()` — sends reset link via email. |
+| OTP via email | Passwordless | 6-digit code. Also used for email verification on register. |
+| Password reset | Forgot password | `supabase.auth.resetPasswordForEmail()` |
 
 ### Auth flows
 
-- New user → Register screen → Companion Introduction → In-app tour → Dashboard
-- Returning user → Login screen → Dashboard
+- New user → Register → Companion Introduction → In-app tour → Dashboard
+- Returning user → Login → Dashboard
 - No landing page — straight to Register on first visit
-- Session persists. Once logged in, stays logged in.
+- Session persists
 
 ### Email infrastructure
 
-**Current (development + early testing):**
-- Supabase built-in email (3 emails/hour limit)
-- Fine for 2-3 testers
-- Google OAuth recommended as primary to avoid email dependency
+**Now (dev + early testing):**
+- Supabase built-in email (3/hour limit)
+- Google OAuth as primary to avoid email dependency
 
 **When scaling to 60 people:**
-- Buy domain (recommended: `germanlern.app` via Cloudflare Registrar, ~$14/year)
-- Set up Resend (free tier: 3,000 emails/month, 100/day) connected to Supabase SMTP
+- Buy domain — `germanlern.app` via Cloudflare Registrar (~€14/year)
+- Set up Resend free tier (3,000 emails/month) connected to Supabase SMTP
 - Sending address: `noreply@germanlern.app`
-- Point domain to Vercel, configure DNS for Resend — ~1 hour total setup
 
 ### Security
 
-- **Row Level Security (RLS)** — every table has policies. Users can only read and write their own data via `user_id = auth.uid()`.
-- **Rate limiting** — all edge functions rate limited to prevent AI quota abuse. Supabase native rate limiting.
-- **Input sanitization** — all user text sanitized before database storage.
-- **Account deletion** — users can delete their account and all associated data. GDPR compliance.
-- **Email domain restriction** — optional future addition if the tool needs to be restricted to a specific university domain.
-- **Storage buckets** — private, access via signed URLs only.
+- RLS on every table — `user_id = auth.uid()` on all policies
+- Rate limiting on all server functions — prevent AI quota abuse
+- Input sanitization on all user text before database storage
+- Account deletion — users can delete account and all data (GDPR)
+- Storage buckets private — signed URLs only
+- Service role key only in server functions, never in client
 
-### Feedback and error reporting
+### Feedback & Error Reporting
 
-- **Sentry** — automatic error and crash tracking. Free tier covers 5,000 errors/month. Alerts sent to Telegram.
-- **Feedback button** — unobtrusive button on every page. Opens a small modal: bug report or suggestion, free text input, submit. Posts to a private Telegram chat via Telegram bot API through an edge function.
-- **Telegram bot** — receives both Sentry alerts and user feedback. Feedback messages include user email, current page, message, and timestamp.
+- Sentry catches crashes automatically, alerts to Telegram
+- Feedback button on every page — bug or suggestion, posts to Telegram bot
 
 ```
 🐛 Bug Report
-User: hana@email.com
+User: cindy@email.com
 Page: /study/session
 Message: "Matching exercise froze after first pair"
 Time: Apr 19, 2026 14:32
 ```
 
-When adding user auth is added to Supabase, all `user_id` foreign keys are already in the schema — no refactoring needed.
-
 ---
 
-## 5. The Companion
+## 5. The Companion — Lumi
 
 The emotional and visual core of the app.
 
-### What it is
-- A custom 3D fluffy/furry character built by us, rendered via Three.js
-- Asset produced externally (sketch → AI image → Blender model)
-- She only names it — design, animations, and behavior are fully defined by us
+### Design
+- Custom 3D lavender furball creature with string-like limbs ending in fur puffs
+- Produced via: Tripo3D text-to-3D → Blender rigging (FK bone chains) → named animation actions baked into `.glb`
+- Default name: **Lumi** (set during onboarding, editable in settings)
 
 ### Behavior by page
 
-| Page | Companion state |
+| Page | State |
 |---|---|
-| Dashboard | Full size, center stage in hero section. Wanders freely, nudges the stats board left and right. |
-| All other pages (except study) | Small 80×80px fixed overlay, bottom right corner, 20px from edges. Wanders within the small square. Pulsing dot indicator shows it's alive. |
-| Study session | Completely hidden. No distractions during study. |
+| Dashboard | Full size, center stage in hero. Wanders freely, nudges stats board. |
+| All other pages (except study) | 80×80px fixed overlay, bottom right, 20px from edges. Wanders in small area. |
+| Study session | Hidden completely. No distractions. |
 
 ### Mini companion interaction
-- Tap the mini companion → Framer Motion animation: companion walks from bottom right to center screen, card expands around it, scrim fades in
-- Expanded state: chat history above, text input below, close button
-- On close: reverse animation — companion walks back to bottom right, card shrinks
 
-### Companion states
+Tap the mini widget → Framer Motion animation: companion walks from bottom right to center screen, card expands, scrim fades in. Chat history above, text input below. On close: reverse animation.
+
+### Companion states (Three.js AnimationMixer, named actions in `.glb`)
 
 | State | Trigger |
 |---|---|
-| Happy / celebrating | After a good study session |
-| Cheering | Mid-session encouragement |
-| Consoling gently | After a hard session |
-| Sleeping | No activity for 2+ days |
-| Idle / wandering | Default dashboard state |
-| Excited | New words added, streak milestone |
+| `idle` | Default — subtle breathing, wanders |
+| `happy` | After a good study session |
+| `wave` | Greeting on dashboard open |
+| `cheering` | Mid-session encouragement |
+| `consoling` | After a hard session |
+| `sleeping` | No activity for 2+ days |
+| `excited` | Streak milestone, new words added |
+| `walking` | Transition animation between positions |
 
 ### Companion intelligence
-- Fully context-aware: knows her word library, learning stages, weak words, session history, streak, current page, due words
-- Maintains conversation memory within a session. Resets on app close.
-- Text bubbles only in v1. Messages AI-generated, warm, varied, never repetitive.
-- She can ask it anything in the expanded chat: "what are my weakest words", "explain dative case", "give me 5 food words" — it answers using her actual data.
 
-### Context payload sent with every companion message
+Fully context-aware. Every message includes a context payload:
 - Current page
 - Word count by stage
 - Weak words (lowest EF)
@@ -205,7 +201,9 @@ The emotional and visual core of the app.
 - Current streak
 - Today's activity
 - Last session result
-- Conversation history this session
+- Conversation history this session (resets on app close — per-session memory only)
+
+**Rule:** Purple = companion or AI. Always. No other element uses Lumi's lavender colors.
 
 ---
 
@@ -213,198 +211,127 @@ The emotional and visual core of the app.
 
 ### Companion Introduction (full screen, once after register)
 
-Three steps, progress dots at top. Companion is present and animated throughout.
+Three steps, progress dots at top. Companion animated throughout.
 
 | Step | Content |
 |---|---|
-| 1 | Companion appears. "Hi! What would you like to call me?" → text input for name |
-| 2 | "Nice to meet you, [name]! What language should I translate German words into?" → language pills, Indonesian pre-selected |
-| 3 | "How many new words do you want to learn each day?" → 5 / 10 / 20 pills, 10 pre-selected → "Let's go!" |
+| 1 | Companion appears. "Hi! What would you like to call me?" → name input |
+| 2 | "What language should I translate German words into?" → language pills, Indonesian pre-selected |
+| 3 | "How many new words per day?" → 5 / 10 / 20 pills, 10 pre-selected → "Let's go!" |
 
-On completion: saves companion name, target language, daily goal → navigates to dashboard → triggers in-app tour.
+On complete: saves name, language, daily goal to `settings` → triggers in-app tour.
 
-### In-app Tour (spotlight overlay, once after companion introduction)
+### In-app Tour (spotlight overlay, once)
 
-Built from scratch. A `TourOverlay` component rendered via React portal at root level. Darkens screen with `rgba(0,0,0,0.55)`. Cutout highlights the target element using `box-shadow: 0 0 0 9999px rgba(0,0,0,0.55)`. Tooltip card near target has companion avatar, title, body, step counter, prev/next.
+`TourOverlay` component via React portal. Scrim `rgba(0,0,0,0.55)`. Cutout highlights target. Tooltip card has companion avatar, title, body, step counter, prev/next.
 
-| Step | Target | Title | Body |
+| Step | Target ID | Title | Body |
 |---|---|---|---|
-| 1 | `nav-dashboard` | Your home base | This is where your companion lives and your daily summary waits. |
-| 2 | `nav-library` | Your word library | Every word you add lives here. Search, filter, and review anytime. |
-| 3 | `btn-add-words` | Adding words | Tap here to add new German words. Type, scan, or paste a list. |
-| 4 | `nav-study` | Study sessions | The app decides what you need most, or you choose. |
-| 5 | `nav-read` | Reading module | Read German texts and tap any word for instant translation. |
-| 6 | `nav-documents` | Your documents | Store textbooks, notes, and PDFs. Annotate and highlight freely. |
-| 7 | `companion-area` | Your companion | This is [name]. They'll cheer you on and answer your questions. |
+| 1 | `nav-dashboard` | Your home base | This is where Lumi lives and your daily summary waits. |
+| 2 | `nav-library` | Your word library | Every word you add lives here. |
+| 3 | `btn-add-words` | Adding words | Type, scan, or paste a list. |
+| 4 | `nav-study` | Study sessions | The app decides what you need, or you choose. |
+| 5 | `nav-read` | Reading module | Tap any word for instant translation. |
+| 6 | `nav-documents` | Your documents | Store textbooks, notes, and PDFs. |
+| 7 | `companion-area` | Meet Lumi | They'll cheer you on and answer your questions. |
 
-`tourCompleted` saved to localStorage. Never repeats.
+`tour_completed` saved to `settings` table. Never repeats.
 
 ---
 
 ## 7. Word Adding Flow
 
-### 7.1 Input modes
-
-Three modes, accessed via bookmark-style tabs (active tab sits higher, connects flush to the drawer/modal body):
+### Input modes (bookmark-style tabs — active tab higher, flush to panel)
 
 | Mode | Description |
 |---|---|
 | Type | Manual word-by-word input |
-| Scan | Camera or photo upload, OCR extracts words (Phase 2) |
-| Paste | Paste a list of words, one per line |
+| Scan | Camera or photo upload, OCR (Phase 2) |
+| Paste | Paste a list, one word per line |
 
-### 7.2 The buffer
+### The buffer
 
-Words never go directly to the library. They land in a **buffer** — a staging area.
+- Words land in the buffer — never go directly to the library
+- Adding is always free and unblocked
+- Buffer badge always visible inside drawer/modal regardless of active tab
+- When she navigates away with unverified words → prompt to verify or add more
+- She is **never** interrupted mid-add
 
-Rules:
-- Adding words is always free and unblocked
-- She can add as many words as she wants at any time
-- When she tries to navigate away with unverified words in the buffer → a prompt appears asking her to verify or add more
-- She is **never interrupted mid-add**. The prompt only appears when she closes the add drawer/modal.
-- The buffer badge (persistent, always visible inside the drawer/modal) shows word count at all times regardless of which tab is active
+### Add UI
 
-### 7.3 Add UI
+**Mobile:** Bottom drawer, no bottom rounding, bookmark tabs protrude from top. Fixed height across all tabs — never resizes.
 
-**Mobile:** Bottom drawer, slides up from bottom. No bottom rounding (flat against screen edge). Top-right corner of drawer rounded. Bookmark tabs protrude from the top edge of the drawer. All three tabs render same fixed height — never resizes on tab switch.
+**Desktop:** Centered modal with scrim. Same bookmark tab pattern. Fixed modal dimensions.
 
-**Desktop:** Centered modal with scrim. Same bookmark tab pattern. Fixed modal dimensions regardless of active tab.
+### Duplicate detection (client-side, before AI)
 
-### 7.4 Verify flow
+- Word does not exist → proceed normally
+- Word exists, same translation → skip silently
+- Word exists, different translation → add to `alt_translations[]` on existing entry, notify user
 
-Triggered when she navigates away with buffer words pending.
+### Verification pipeline (three layers)
 
-**Stage 1 — Loading**
-Centered overlay card. Sends all buffered words to AI in one batch call. Progress shown per word (pill indicators).
+**Layer 1 — Dictionary (authoritative)**
+1. DWDS (Digitales Wörterbuch der deutschen Sprache) — primary, free API, returns gender and word type as ground truth
+2. Wiktionary — fallback if DWDS has no result
+3. Not found anywhere → warn user: "Couldn't confirm this word — add anyway?"
 
-**Stage 2 — Word by word review**
-Same overlay transitions. For each word, a form shows all fields with AI suggestions as a highlighted row below each input. She can accept each suggestion individually or tap "Accept All". After all words reviewed → library updated → overlay closes → she lands back where she was.
+**Layer 2 — AI enrichment (Gemini, after dictionary confirms)**
+- Spelling correction (rejectable)
+- Translation suggestion (editable)
+- 1–2 example sentences with translation
+- Auto AI tags (animals, food, travel, daily life, academic, etc.)
 
-**Stage 3 — Finishing**
-Brief 1-2 second "All done" state before closing. Not skippable — gives her a moment of satisfaction.
-
-### 7.5 Duplicate detection (runs client-side before AI batch)
-
-Before sending any word to AI verification, check it against the user's existing library:
-
-- **Word does not exist** → proceed to AI verification as normal, create new entry
-- **Word exists with same translation** → skip silently, already in library, do not add
-- **Word exists with different translation** → do not create new entry, instead add the new translation to `alt_translations[]` of the existing word, notify user: *"[word] already in your library — added a new translation"*
-
-This check happens entirely client-side against the locally cached library. Only genuinely new words or translation merges proceed to the AI batch call.
-
-### 7.6 Verification pipeline (runs once per batch)
-
-Three layers in order:
-
-**Layer 1 — Dictionary verification (authoritative)**
-
-Check each word against real German dictionaries before AI:
-
-1. **DWDS** (Digitales Wörterbuch der deutschen Sprache) — primary source. Authoritative, academic, free API. Returns word existence, gender, word type.
-2. **Wiktionary API** — fallback if DWDS has no result. Free, no key needed, broad coverage.
-
-Outcomes:
-- Found in DWDS or Wiktionary → word confirmed real, use dictionary gender and word type as ground truth
-- Not found in either → flag as unverified, show warning: *"Couldn't confirm this word in any dictionary — add anyway?"* User can proceed or discard.
-
-**Layer 2 — AI enrichment (runs after dictionary confirms word)**
-
-For each confirmed word:
-1. Suggest spelling correction if needed (rejectable)
-2. Suggest translation in target language (editable)
-3. Generate 1–2 example sentences with translation
-4. Auto-assign AI tags (e.g. `animals`, `food`, `travel`, `daily life`, `academic`)
-
-AI does not determine gender or word type — dictionary data is used as ground truth for those fields.
+AI never determines gender or word type — dictionary is ground truth for those.
 
 **Layer 3 — User review**
 
-User reviews all fields with AI suggestions highlighted. Can accept, edit, or reject every suggestion individually. "Accept All" accepts everything for that word.
+Two-stage modal: Loading (batch AI call with per-word progress pills) → Word-by-word review form (AI suggestions highlighted, accept individually or "Accept All").
 
-### 7.7 Failure handling
+### AI / dictionary failure handling
 
-**Dictionary API failure:**
-- Fall back to AI-only verification
-- Show subtle warning: *"Dictionary unavailable — verified by AI only"*
-- Word gets an `ai_only_verified` flag in database
-
-**AI batch failure:**
-- Show error state in loading card
-- Offer retry or "Skip verification — add anyway"
-- Words added without AI enrichment get an `unverified` flag in library and can be enriched later
-
-### Edge functions updated
-
-| Function | Purpose |
-|---|---|
-| `verify-words` | Duplicate check → DWDS lookup → Wiktionary fallback → AI enrichment batch |
+- Dictionary API fails → fall back to AI-only, flag word as `ai_only`
+- AI batch fails → offer retry or "Add anyway" with `unverified` flag
+- Unverified words visible in library, can be enriched later
 
 ---
 
 ## 8. Word Database Structure
 
-```sql
-words (
-  id                  uuid primary key,
-  user_id             uuid references users,
-  german_word         text not null,
-  word_type           text,           -- noun | verb | adjective | adverb | other
-  translation         text,
-  alt_translations    jsonb,          -- string[]
-  example_sentences   jsonb,          -- [{german, translation}]
-  ai_tags             text[],
-  user_tags           text[],
+Grammar fields populated per `word_type`. AI never overrides dictionary-sourced gender or word type.
 
-  -- Grammar fields (populated based on word_type)
-  gender              text,           -- der | die | das | null (nouns only)
-  plural_form         text,           -- (nouns only)
-  conjugations        jsonb,          -- {ich, du, er, wir, ihr, sie} (verbs only)
-  conjugation_type    text,           -- weak | strong | irregular (verbs only)
-  is_separable        boolean,        -- (verbs only)
-  takes_case          text,           -- akkusativ | dativ | null (verbs only)
-  comparative         text,           -- (adjectives only)
-  superlative         text,           -- (adjectives only)
+**Noun:** `gender`, `plural_form`
+**Verb:** `conjugations`, `conjugation_type`, `is_separable`, `takes_case`
+**Adjective:** `comparative`, `superlative`
 
-  -- Learning engine fields (never shown raw to user)
-  learning_score      int default 0,
-  easiness_factor     numeric default 2.5,
-  interval_days       int default 1,
-  next_review_date    date,
-  last_reviewed       timestamptz,
-  review_count        int default 0,
-  date_added          timestamptz default now(),
-  verification_source text default 'pending', -- 'dwds' | 'wiktionary' | 'ai_only' | 'unverified'
-  verified_at         timestamptz
-)
-```
+Full schema in Section 17.
 
-### Vocabulary stages (derived from learning score, shown to user)
+### Vocabulary stages (derived from SM-2 fields, never raw numbers shown)
 
-| Label | Meaning |
-|---|---|
-| 🌱 Just Planted | New, never studied |
-| 🔄 Still Growing | Seen but inconsistent |
-| 💪 Almost There | Usually correct |
-| ⭐ Mastered | Consistently correct over time |
+| Stage | Label | Condition |
+|---|---|---|
+| 🌱 | Just Planted | `review_count = 0` |
+| 🔄 | Still Growing | `review_count > 0` and `easiness_factor < 2.0` |
+| 💪 | Almost There | `review_count > 0` and `easiness_factor` between 2.0–2.49 |
+| ⭐ | Mastered | `easiness_factor >= 2.5` and `review_count >= 5` |
 
 ---
 
-## 9. Learning Engine
+## 9. Learning Engine — SM-2
 
-### 9.1 Algorithm — SM-2
+### Algorithm
 
 Every word has an **Easiness Factor (EF)** starting at 2.5 and an **interval** (days until next review).
 
-After every exercise, a quality score **q** (0–5) is derived from performance.
+After every exercise a quality score **q** (0–5) is derived from performance.
 
-**EF update formula:**
+**EF update:**
 ```
 EF = EF + (0.1 - (5 - q) × (0.08 + (5 - q) × 0.02))
 EF minimum = 1.3
 ```
 
-**What each score produces:**
+**EF change per score:**
 
 | q | EF change |
 |---|---|
@@ -419,323 +346,576 @@ EF minimum = 1.3
 - q ≥ 3 → new interval = previous interval × EF
 - q < 3 → interval resets to 1 day
 
-### 9.2 Scoring per exercise type
+### Scoring per exercise type
 
-**Typing exercises (Translation, Reverse Translation):**
+**Typing (translation, reverse translation):**
 - Correct → 5
-- Minor variation (fuzzy match) → 3
+- Minor variation (client-side fuzzy match — Levenshtein distance) → 3
 - Wrong → 1
 
-Fuzzy matching is client-side only (Levenshtein distance). No AI mid-session. Minor variation covers: typos, missing umlaut (Strasse/Straße), single character slip.
-
-**Choice exercises (Single choice, Multiple choice, Matching):**
-- Correct → 4 (not 5 — recognition is easier than active recall)
+**Choice (single choice, multiple choice, matching):**
+- Correct → 4 (recognition easier than active recall — ceiling intentionally lower)
 - Wrong → 1
 
-**Multiple choice partial credit — Jaccard similarity:**
+**Multiple choice partial — Jaccard similarity:**
 ```
 jaccard = |correct ∩ selected| / |correct ∪ selected|
-
-jaccard = 1.0      → q = 4
-jaccard ≥ 0.6      → q = 3
-jaccard ≥ 0.3      → q = 2
-jaccard < 0.3      → q = 1
+1.0       → q = 4
+≥ 0.6     → q = 3
+≥ 0.3     → q = 2
+< 0.3     → q = 1
 ```
-Selecting wrong answers actively penalizes the score. Guessing everything is punished.
 
-**Time:** Not used in scoring. Unreliable — she might put the phone down mid-question.
+**Flashcards:** No SM-2 update. Review mode only, never affects scoring.
 
-**Flashcards:** No SM-2 update. Separate review mode only. Never affects scoring.
+**Time:** Not used in scoring.
 
-### 9.3 Study session queue logic
+### Study session queue
 
-**Automatic session (default):**
-1. All words where `next_review_date <= today` → due queue
+**Automatic:**
+1. Words where `next_review_date <= today` → due queue
 2. Prioritize lowest EF within due queue
 3. Mix in new words (max 5–10 per session)
-4. If nothing due → surface lowest EF words regardless of date
+4. Nothing due → surface lowest EF regardless of date
 
-**Exercise type selection per word (automatic):**
-- Never seen → single/multiple choice first (recognition before active recall)
+**Exercise type per word (automatic):**
+- Never seen → single/multiple choice first
 - Seen 1–2 times → multiple choice or matching
 - Seen several times → translation or reverse translation
-- High EF, just due → single choice is sufficient
+- High EF, just due → single choice sufficient
 
-**Session questions generated upfront:** One AI batch call before the session starts. AI generates all questions, wrong answer options (plausible distractors, not random), and matching pairs. Session runs entirely from local JSON. No AI calls mid-session.
-
-### 9.4 Study configure modes
-
-Three modes with bookmark tabs:
-
-| Mode | Description |
-|---|---|
-| Auto | SM-2 queue, just start. Primary default path. |
-| By tag | Select one or more tags. Session built from matching words. |
-| Ask companion | Describe what to study in natural language. AI maps intent to words. |
+**Session generation:** One Gemini batch call before session starts. All questions, wrong answer options (plausible distractors), matching pairs generated upfront. Session runs entirely from local JSON. No mid-session AI calls.
 
 ---
 
 ## 10. Exercise Types
 
-| Type | Answer format | Max score |
+| Type | Answer format | Max q |
 |---|---|---|
 | Single choice | Tap one option | 4 |
-| Multiple choice | Tap all correct options | 4 (Jaccard mapped) |
+| Multiple choice | Tap all correct (Jaccard scored) | 4 |
 | Translation | German → type Indonesian | 5 |
 | Reverse translation | Indonesian → type German | 5 |
-| Matching | Connect 4 word pairs | 4 per pair |
-
-Fill-in-the-sentence was explicitly removed — even without grammar, it begins to test grammatical forms which belongs in the v2 grammar engine.
+| Matching | Connect 4 word-translation pairs | 4 per pair |
 
 ### Session results framing
 - Always show: "18 correct" — positive frame
-- Never show: "2 wrong" — no punishment
-- Companion message after session matches energy: celebrates wins, gently encourages after hard sessions
+- Never show: "2 wrong"
+- Companion message matches energy — celebrates wins, gently encourages after hard sessions
 
 ---
 
-## 11. Word Library
+## 11. Study Configure Modes (bookmark tabs)
 
-### Views
-Two views toggled by a sliding thumb toggle (not a pill toggle):
-- **List** — dense, one row per word
-- **Cards** — responsive grid, more breathing room per word
+| Mode | Description |
+|---|---|
+| Auto | SM-2 queue. Just start. Primary default. |
+| By tag | Select tags. Session built from matching words. |
+| Ask companion | Describe what to study. AI maps intent to words. |
 
-### List row content
-Stage dot · German word · gender pill · type chip · translation · tags (max 2) · due badge
+---
 
-### Card content
-Colored stage strip at top (3px) · word · type chip + gender pill (same row, consistent height always) · translation · tag · due badge
+## 12. Word Library
+
+### Views (sliding thumb toggle — not a pill toggle)
+- **List** — dense, one row per word: stage dot · word · gender · type · translation · tags · due
+- **Cards** — responsive grid: stage color strip · word · type+gender row · translation · tag · due
 
 ### Desktop detail
-Split panel: left shows narrowed list or card grid with selected word highlighted, right shows full word detail. Toggle between list/card view preserved in left panel.
+Split panel — left: narrowed list or card grid with selected word highlighted. Right: full word detail. Toggle preserved.
 
 ### Mobile detail
 Full page navigation with back button.
 
 ### Word detail content
-Gender + type + stage chips (all same Chip component, same size) → word large → translation → alt translations → example sentences → grammar section (content depends on word type) → tags → learning stats (reviews, correct rate, next review, EF)
+Gender + type + stage chips → word large → translation → alt translations → example sentences → grammar section → tags → learning stats (reviews, correct rate, next review, EF)
 
-### Search and filtering
-- Fuzzy dual-language search (German and Indonesian simultaneously)
-- Filters: stage, word type, tags, sort (A→Z, date added, stage, last reviewed, next review)
+### Search & filtering
+- Full-text search via PostgreSQL `tsvector` — German and Indonesian simultaneously
+- Filters: stage, word type, tags, verification source
+- Sort: A→Z, date added, stage, last reviewed, next review date
 
 ---
 
-## 12. Dashboard
+## 13. Dashboard
 
 ### Desktop layout
-- **Sidebar (fixed):** navigation + streak + total words. Always visible on all pages.
-- **Top bar:** greeting + "+ Add words" CTA
-- **Hero (~42% height):** companion left (wanders, nudges board) + stats board right (due today CTA + word stages breakdown). Companion and board share the same open canvas — companion physically nudges the board.
-- **Quick actions:** 4 cards (Add words, Study, Read, Documents) with contextual hints
-- **Bottom row:** Word of the Day (flex:2) + Last Session + This Week bar chart — all same height via `alignItems: stretch`
+- **Sidebar (fixed):** nav + streak + total words. Visible on all pages.
+- **Top bar:** greeting + "+ Add words" button
+- **Hero (~42% height):** companion (left, open canvas, wanders and nudges board) + stats board (right: due today CTA + word stage breakdown)
+- **Quick actions:** 4 cards — Add words, Study, Read, Documents
+- **Bottom row:** Word of Day (flex:2) + Last Session + Weekly bar chart — all same height
 
 ### Mobile layout
-- Companion + speech bubble area at top
-- Three stat cards (streak, study time, words)
-- Word stages breakdown card
-- Due today card with Study now CTA
-- Three quick action cards
-- Word of the day
+Companion + bubble → stat cards (streak, study time, words) → stage breakdown → due today CTA → quick actions → word of day
 
 ---
 
-## 13. Reading Module
+## 14. Reading Module
 
 ### Library screen
-- History of previously read texts as cards (title, date, word count, words added badge)
-- Two action buttons: Paste/Upload + Generate
-- AI generation: no required parameters. Optional prompt input. If she hits generate with no input → AI picks topic, medium length, matches her level, includes weak words.
+- Text history as cards (title, date, word count, words added badge)
+- Paste/Upload + Generate buttons
+- Generate: no required params. Optional prompt. Defaults to user level + weak words if empty.
 
 ### Reader
-- Single continuous scrollable text (no pagination)
-- Words already in her library: dotted underline indicator
-- **Tap any word** → popup with translation, type, gender, stage, "Add to buffer" button
-- **Tap any sentence** → popup with German text, Indonesian translation, "Add distinct words to buffer" button (AI extracts meaningful words from selection, filters out articles/prepositions/words already in library)
+- Single scrollable text — no pagination
+- Words already in library: dotted underline
+- **Tap word** → popup: translation, type, gender, stage, "Add to buffer"
+- **Tap sentence** → popup: German + Indonesian translation, "Add distinct words to buffer"
 - Buffer badge always visible in reader topbar
-- Adding words from reading **never interrupts reading**. Words go to buffer silently. She verifies later by normal rules.
+- Never interrupts reading — all adds go to buffer silently
 
-### Desktop reader layout
-Full main area for text, right panel slides in for word/sentence popups (240px).
+### Desktop layout
+Full main area for text. Right panel (240px) slides in for word/sentence popups.
 
-### Mobile reader layout
-Full screen text, bottom sheet slides up for word/sentence popups.
+### Mobile layout
+Full screen text. Bottom sheet slides up for popups.
 
 ---
 
-## 14. Documents
+## 15. Documents
 
-### Document types
+### Types
 
 | Type | Creation | Editing |
 |---|---|---|
-| PDF | Upload file | View only |
-| Rich text | Type, paste, or insert images | Full editor (Tiptap) |
+| PDF | Upload file | View only — annotate on top |
+| Rich text | Type, paste, insert images | Tiptap editor with toolbar |
 
-Rich text has two modes: **Edit** (full Tiptap editor with toolbar, inline images) and **Read** (clean reading view, same as PDF viewer visually). Toggle in topbar.
+Rich text: **Edit** mode (full Tiptap editor) and **Read** mode (clean, same as PDF viewer). Toggle in topbar.
 
-Pasting text into the add flow creates a rich text document automatically.
+Tiptap JSON stored in `documents.content` column — not in storage. Images inside rich text go to Supabase Storage, URL stored in Tiptap JSON.
 
-### Annotation layer
-Works identically on both PDF and rich text in read mode:
-- **Highlights** — select text, highlight saved with color and position
-- **Bookmarks** — mark a page/position with optional note
-
-Annotations persist across sessions in database.
+### Annotations
+- Highlights and bookmarks persist across sessions
+- Work identically on PDF and rich text in read mode
 
 ### Desktop layout
-Full main area for document, collapsible right panel (220px) for annotations (bookmarks list + highlights list).
+Full main area for document. Collapsible right panel (220px) for annotations.
 
 ### Mobile layout
-Full screen document, annotations accessible via bottom sheet triggered by toolbar button.
+Full screen. Annotations via bottom sheet.
 
-### Vocabulary mining from documents
-- **Select a single word** → popup with translation + add to buffer
-- **Select a sentence or larger chunk** → AI identifies all distinct meaningful words, shows as list, she picks which to add to buffer
-
----
-
-## 15. Settings
-
-Three controls only:
-
-| Setting | Options |
-|---|---|
-| Target language | Indonesian (default), others |
-| Companion name | Text input, editable |
-| Daily goal | 5 / 10 / 20 words per day |
-
-Full page on both desktop and mobile. No dark/light theme in v1.
+### Vocabulary mining
+- **Select single word** → popup with translation + add to buffer
+- **Select sentence/chunk** → AI extracts distinct meaningful words, filters articles/prepositions/already-in-library, shows list to pick from
 
 ---
 
-## 16. Profile
+## 16. Settings, Profile & Sustainability
 
-Three items only:
+### Settings (3 controls only)
+- Target language (Indonesian default)
+- Companion name (editable)
+- Daily goal (5 / 10 / 20)
 
-- Email — read-only field with "Change" link
-- Password — displayed as `••••••••` with "Change" link
-- Logout — full width button, muted red styling
+### Profile (3 items only)
+- Email — read-only + "Change" link
+- Password — `••••••••` + "Change" link
+- Logout — muted red destructive button
 
-No stats (covered by dashboard). No avatar.
+### Sustainability
+Non-intrusive section in profile only. Never in popups.
+
+> "Running this app costs about the price of a portion of tofu per person per month. If GermanLern has helped you learn even one word, consider helping keep it alive 🥣"
+
+Progress bar in IDR. Ko-fi link. 100% of contributions go to server and domain costs.
 
 ---
 
 ## 17. Full Database Schema
 
+All tables use UUID primary keys. RLS on every table. `user_id = auth.uid()` on all policies.
+
+---
+
+### Auth & Users
+
 ```sql
-users (
-  id                uuid primary key,
-  email             text unique not null,
-  password_hash     text not null,
-  created_at        timestamptz default now()
+-- auth.users managed by Supabase automatically
+
+-- Extended profile — created via trigger on auth.users insert
+profiles (
+  id                    uuid primary key references auth.users on delete cascade,
+  email                 text not null,
+  created_at            timestamptz default now(),
+  updated_at            timestamptz default now()
 )
 
+-- User preferences and onboarding state
 settings (
-  id                uuid primary key,
-  user_id           uuid references users unique,
-  companion_name    text default 'Lumi',  target_language   text default 'Indonesian',
-  daily_goal        int default 10,
-  created_at        timestamptz default now()
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles unique not null,
+  companion_name        text default 'Lumi',
+  target_language       text default 'Indonesian',
+  daily_goal            int default 10,
+  onboarding_completed  boolean default false,
+  tour_completed        boolean default false,
+  created_at            timestamptz default now(),
+  updated_at            timestamptz default now()
 )
+```
 
+---
+
+### Words & Vocabulary
+
+```sql
 words (
-  id                uuid primary key,
-  user_id           uuid references users,
-  german_word       text not null,
-  word_type         text,
-  translation       text,
-  alt_translations  jsonb,
-  example_sentences jsonb,
-  ai_tags           text[],
-  user_tags         text[],
-  gender            text,
-  plural_form       text,
-  conjugations      jsonb,
-  conjugation_type  text,
-  is_separable      boolean,
-  takes_case        text,
-  comparative       text,
-  superlative       text,
-  learning_score    int default 0,
-  easiness_factor   numeric default 2.5,
-  interval_days     int default 1,
-  next_review_date  date,
-  last_reviewed     timestamptz,
-  review_count      int default 0,
-  date_added        timestamptz default now()
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+
+  -- Core
+  german_word           text not null,
+  word_type             text,             -- noun | verb | adjective | adverb | other
+  translation           text,
+  alt_translations      jsonb,            -- string[]
+  example_sentences     jsonb,            -- [{german, translation}]
+
+  -- Grammar (per word_type)
+  gender                text,             -- der | die | das (nouns)
+  plural_form           text,             -- nouns
+  conjugations          jsonb,            -- {ich, du, er, wir, ihr, sie} (verbs)
+  conjugation_type      text,             -- weak | strong | irregular (verbs)
+  is_separable          boolean,          -- verbs
+  takes_case            text,             -- akkusativ | dativ (verbs)
+  comparative           text,             -- adjectives
+  superlative           text,             -- adjectives
+
+  -- Tags
+  ai_tags               text[],
+
+  -- Verification
+  verification_source   text default 'pending',  -- dwds | wiktionary | ai_only | unverified | pending
+  verified_at           timestamptz,
+
+  -- Origin
+  source                text default 'manual',   -- manual | paste | scan | reading | document
+  source_ref_id         uuid,                    -- reading_texts.id or documents.id
+
+  -- SM-2 engine
+  easiness_factor       numeric default 2.5,
+  interval_days         int default 1,
+  next_review_date      date,
+  last_reviewed         timestamptz,
+  review_count          int default 0,
+
+  -- Full-text search
+  search_vector         tsvector generated always as (
+                          to_tsvector('simple', coalesce(german_word, '')) ||
+                          to_tsvector('simple', coalesce(translation, '')) ||
+                          to_tsvector('simple', coalesce(array_to_string(ai_tags, ' '), ''))
+                        ) stored,
+
+  date_added            timestamptz default now(),
+  updated_at            timestamptz default now()
 )
 
+-- User-created custom tags
+user_tags (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  name                  text not null,
+  created_at            timestamptz default now(),
+  unique (user_id, name)
+)
+
+-- Words ↔ user tags (many-to-many)
+word_user_tags (
+  word_id               uuid references words on delete cascade not null,
+  tag_id                uuid references user_tags on delete cascade not null,
+  primary key (word_id, tag_id)
+)
+
+-- Words added but not yet verified
 word_buffer (
-  id                uuid primary key,
-  user_id           uuid references users,
-  german_word       text not null,
-  translation       text,
-  created_at        timestamptz default now()
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  german_word           text not null,
+  translation           text,
+  notes                 text,
+  custom_sentence       text,
+  raw_user_tags         text[],
+  created_at            timestamptz default now()
+)
+```
+
+---
+
+### Study Sessions
+
+```sql
+-- One row per study session
+study_sessions (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  mode                  text not null,    -- auto | by_tag | companion
+  tag_filter            text[],
+  companion_prompt      text,
+  words_reviewed        int default 0,
+  correct_count         int default 0,
+  started_at            timestamptz default now(),
+  ended_at              timestamptz,
+  completed             boolean default false
 )
 
-review_sessions (
-  id                uuid primary key,
-  user_id           uuid references users,
-  started_at        timestamptz,
-  ended_at          timestamptz,
-  mode              text,
-  words_reviewed    int,
-  correct_count     int,
-  tag_filter        text
+-- One row per word per session
+study_results (
+  id                    uuid primary key default gen_random_uuid(),
+  session_id            uuid references study_sessions on delete cascade not null,
+  word_id               uuid references words on delete cascade not null,
+  exercise_type         text not null,    -- single_choice | multi_choice | translation | reverse_translation | matching
+  quality_score         int not null,     -- 0–5 SM-2 score
+  was_correct           boolean not null,
+  created_at            timestamptz default now()
 )
+```
 
-review_results (
-  id                uuid primary key,
-  session_id        uuid references review_sessions,
-  word_id           uuid references words,
-  exercise_type     text,
-  quality_score     int,
-  was_correct       boolean,
-  time_taken_ms     int
+---
+
+### Streaks
+
+```sql
+streaks (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles unique not null,
+  current_streak        int default 0,
+  longest_streak        int default 0,
+  last_activity_date    date,
+  updated_at            timestamptz default now()
 )
+```
 
+---
+
+### Reading Module
+
+```sql
 reading_texts (
-  id                uuid primary key,
-  user_id           uuid references users,
-  title             text,
-  content           text,
-  source            text,       -- 'paste' | 'upload' | 'generated'
-  created_at        timestamptz default now(),
-  last_opened       timestamptz
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  title                 text not null,
+  content               text not null,
+  source                text not null,    -- paste | upload | generated
+  ai_prompt             text,
+  word_count            int,
+  created_at            timestamptz default now(),
+  last_opened_at        timestamptz
 )
 
+reading_word_events (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  reading_text_id       uuid references reading_texts on delete cascade not null,
+  german_word           text not null,
+  action                text not null,    -- tapped | added_to_buffer
+  created_at            timestamptz default now()
+)
+```
+
+---
+
+### Documents
+
+```sql
 documents (
-  id                uuid primary key,
-  user_id           uuid references users,
-  title             text,
-  type              text,       -- 'pdf' | 'rich'
-  content           text,       -- rich text JSON or null for PDF
-  file_url          text,       -- PDF storage URL or null
-  created_at        timestamptz default now()
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  title                 text not null,
+  type                  text not null,    -- pdf | rich
+  content               jsonb,            -- Tiptap JSON (rich only)
+  file_path             text,             -- Storage path (pdf only)
+  file_size_bytes       int,
+  page_count            int,
+  created_at            timestamptz default now(),
+  updated_at            timestamptz default now(),
+  last_opened_at        timestamptz
+)
+
+document_images (
+  id                    uuid primary key default gen_random_uuid(),
+  document_id           uuid references documents on delete cascade not null,
+  user_id               uuid references profiles not null,
+  storage_path          text not null,
+  mime_type             text not null,
+  size_bytes            int,
+  created_at            timestamptz default now()
 )
 
 annotations (
-  id                uuid primary key,
-  document_id       uuid references documents,
-  user_id           uuid references users,
-  type              text,       -- 'highlight' | 'bookmark'
-  page              int,        -- PDF page or null
-  start_offset      int,
-  end_offset        int,
-  note              text,
-  color             text,
-  created_at        timestamptz default now()
+  id                    uuid primary key default gen_random_uuid(),
+  document_id           uuid references documents on delete cascade not null,
+  user_id               uuid references profiles not null,
+  type                  text not null,    -- highlight | bookmark
+  page                  int,
+  start_offset          int,
+  end_offset            int,
+  selected_text         text,
+  note                  text,
+  color                 text default '#ffe890',
+  created_at            timestamptz default now()
 )
 
-streaks (
-  id                uuid primary key,
-  user_id           uuid references users unique,
-  current_streak    int default 0,
-  longest_streak    int default 0,
-  last_activity     date
+document_word_events (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  document_id           uuid references documents on delete cascade not null,
+  german_word           text not null,
+  action                text not null,    -- tapped | added_to_buffer
+  created_at            timestamptz default now()
 )
+```
+
+---
+
+### Analytics & Feedback
+
+```sql
+-- Feature-level event tracking. No PII, no click tracking.
+feature_events (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles not null,
+  event                 text not null,
+  -- study_session_started | study_session_completed
+  -- reading_text_opened | reading_text_generated
+  -- document_created | document_opened
+  -- companion_chat_opened | companion_chat_message_sent
+  -- word_added | words_verified
+  -- feedback_submitted
+  metadata              jsonb,
+  created_at            timestamptz default now()
+)
+
+-- User feedback and bug reports
+feedback (
+  id                    uuid primary key default gen_random_uuid(),
+  user_id               uuid references profiles,   -- nullable
+  type                  text not null,              -- bug | suggestion
+  message               text not null,
+  page_path             text,
+  telegram_sent         boolean default false,
+  created_at            timestamptz default now()
+)
+```
+
+---
+
+### Views (derived — no sync required)
+
+```sql
+-- Powers dashboard weekly chart and session history
+create view user_daily_stats as
+select
+  ss.user_id,
+  ss.started_at::date                                                    as activity_date,
+  count(distinct ss.id)                                                  as sessions_count,
+  coalesce(sum(ss.words_reviewed), 0)                                    as words_reviewed,
+  coalesce(sum(ss.correct_count), 0)                                     as correct_count,
+  coalesce(sum(extract(epoch from (ss.ended_at - ss.started_at)))::int, 0) as study_time_seconds,
+  count(distinct w.id)                                                   as words_added
+from study_sessions ss
+left join words w
+  on  w.user_id = ss.user_id
+  and w.date_added::date = ss.started_at::date
+where ss.completed = true
+group by ss.user_id, ss.started_at::date;
+
+-- Powers dashboard stat cards
+create view user_total_stats as
+select
+  p.id                                                                   as user_id,
+  count(distinct w.id)                                                   as total_words,
+  count(distinct w.id) filter (
+    where w.easiness_factor >= 2.5 and w.review_count >= 5
+  )                                                                      as mastered_words,
+  coalesce(sum(extract(epoch from (ss.ended_at - ss.started_at)))::int, 0) as total_study_seconds,
+  coalesce(sum(ss.words_reviewed), 0)                                    as total_words_reviewed,
+  coalesce(sum(ss.correct_count), 0)                                     as total_correct,
+  count(distinct ss.id)                                                  as total_sessions
+from profiles p
+left join words w on w.user_id = p.id
+left join study_sessions ss on ss.user_id = p.id and ss.completed = true
+group by p.id;
+
+-- Powers "24 words due" dashboard CTA
+create view words_due_today as
+select
+  user_id,
+  count(*) as due_count
+from words
+where next_review_date <= current_date
+  and verification_source not in ('pending', 'unverified')
+group by user_id;
+
+-- Powers stage breakdown bar on dashboard
+create view word_stage_breakdown as
+select
+  user_id,
+  count(*) filter (where review_count = 0)                               as planted,
+  count(*) filter (where review_count > 0 and easiness_factor < 2.0)    as growing,
+  count(*) filter (
+    where review_count > 0
+    and easiness_factor >= 2.0
+    and not (easiness_factor >= 2.5 and review_count >= 5)
+  )                                                                      as almost,
+  count(*) filter (
+    where easiness_factor >= 2.5 and review_count >= 5
+  )                                                                      as mastered
+from words
+where verification_source not in ('pending', 'unverified')
+group by user_id;
+```
+
+---
+
+### RLS Policy Pattern
+
+```sql
+alter table {table} enable row level security;
+
+create policy "users access own data"
+  on {table} for all
+  using (user_id = auth.uid());
+
+-- feedback: allow insert from any authenticated user
+create policy "authenticated users can submit feedback"
+  on feedback for insert
+  with check (auth.uid() is not null);
+```
+
+---
+
+### Indexes
+
+```sql
+-- Words
+create index on words using gin(search_vector);
+create index on words (user_id, next_review_date);
+create index on words (user_id, date_added desc);
+create index on words (user_id, verification_source);
+
+-- Study
+create index on study_sessions (user_id, started_at desc);
+create index on study_sessions (user_id, completed, started_at desc);
+create index on study_results (session_id);
+create index on study_results (word_id);
+
+-- Documents & reading
+create index on documents (user_id, last_opened_at desc);
+create index on reading_texts (user_id, last_opened_at desc);
+create index on annotations (document_id, type);
+
+-- Buffer & tags
+create index on word_buffer (user_id, created_at);
+create index on user_tags (user_id, name);
+create index on word_user_tags (word_id);
+create index on word_user_tags (tag_id);
+
+-- Analytics
+create index on feature_events (user_id, event, created_at desc);
+create index on reading_word_events (user_id, reading_text_id);
+create index on document_word_events (user_id, document_id);
 ```
 
 ---
@@ -745,16 +925,16 @@ streaks (
 ```
 /login                → Login
 /register             → Register
-/onboarding           → Companion Introduction (once after register)
+/onboarding           → Companion Introduction (once)
 /                     → Dashboard
 /words                → Word Library
-/words/[id]           → Word Detail
+/words/$id            → Word Detail
 /study                → Study Configure
 /study/session        → Active Study Session
 /read                 → Reading Library
-/read/[id]            → Reading Text
+/read/$id             → Reading Text
 /documents            → Document Library
-/documents/[id]       → Document Reader / Editor
+/documents/$id        → Document Reader / Editor
 /settings             → Settings
 /profile              → Profile
 ```
@@ -763,76 +943,104 @@ streaks (
 
 ## 19. AI Integration Points
 
-| Feature | When | Type | Notes |
-|---|---|---|---|
-| Word batch verification | On verify tap | Batch async | All buffer words in one call |
-| Translation suggestion | Part of verify batch | Batch | |
-| Grammar detection | Part of verify batch | Batch | |
-| Auto-tagging | Part of verify batch | Batch | |
-| Example sentence generation | Part of verify batch | Batch | |
-| Study session generation | Before session starts | Batch | Full session questions + distractors upfront |
-| Companion messages | After sessions, dashboard load | Single-turn, context-aware | |
-| Companion chat | On user message in chat | Single-turn, context-aware, with history | |
-| Ask companion (study) | On configure | Single-turn | Maps description to word set |
-| Reading word translation | On tap | Single-turn | |
-| Reading sentence translation | On tap | Single-turn | |
-| AI text generation (reading) | On generate tap | Single-turn | |
-| Document vocabulary mining | On text selection | Single-turn | |
+| Feature | Server function | Notes |
+|---|---|---|
+| Word batch verification | `verifyWords` | Duplicate check → DWDS → Wiktionary → Gemini |
+| Study session generation | `generateStudySession` | Full session upfront, no mid-session calls |
+| Companion chat | `companionMessage` | Full context payload, per-session memory |
+| Study configure (companion mode) | `companionMessage` | Maps natural language to word set |
+| Reading word translation | `translateWord` | Single-turn |
+| Reading sentence translation | `translateSentence` | Single-turn |
+| AI reading text generation | `generateReadingText` | Optional prompt, defaults to user level |
+| Document vocabulary mining | `mineVocabulary` | Filters articles, prepositions, known words |
 
 ---
 
-## 21. Sustainability
+## 20. Component Inventory
 
-GermanLern is free and will always stay free. A non-intrusive contribution section lives in the user profile only — never in popups or on other pages.
+### shadcn/ui — `npx shadcn@latest add [name]`
 
-**Framing:**
-> "Running this app costs about the price of a portion of tofu per person per month. If GermanLern has helped you learn even one word, consider helping keep it alive 🥣"
+`button` `input` `textarea` `label` `form` `select` `native-select` `dialog` `drawer` `sheet` `popover` `tabs` `badge` `card` `separator` `progress` `avatar` `skeleton` `sonner` `toast` `tooltip` `command` `combobox` `dropdown-menu` `scroll-area` `switch` `alert` `collapsible` `checkbox` `toggle-group` `input-otp` `sidebar` `spinner` `empty` `breadcrumb` `pagination` `kbd`
 
-**Monthly cost transparency:**
-- Current (free tiers): €0
-- At scale (Supabase Pro + domain + Resend): ~€39/month
-- Per person across 60 users: ~10,000 IDR (~€0.57)
+### Supabase shadcn blocks — via their CLI
 
-**Progress bar** — shown in IDR, updates as contributions come in:
-```
-This month: Rp 80.000 / Rp 390.000
-████░░░░░░░░░░░░ 20%
-```
+`client` `password-based-auth` `social-auth` `dropzone`
 
-**Payment:** Ko-fi link. No custom payment infrastructure. Ko-fi handles transactions, shows progress toward monthly goal automatically.
+### Component usage rules
 
-**Promise to users:** 100% of contributions go to server and domain costs. Zero to developer. Stated explicitly in the profile section.
-
----
-
-## 22. Phased Feature Additions
-
-| Feature | Decision |
+| Use case | Component |
 |---|---|
-| Offline support | Phase 2. Too complex for v1 — requires local word cache, delayed verification queue, sync logic. |
-| Push notifications | Not planned. |
-| Anki import | Not planned. |
-| Companion default name | Lumi |
-| Privacy policy / terms | Simple one-pager before sharing with 60 people. |
+| Desktop modals | `Dialog` |
+| Mobile bottom sheets | `Drawer` |
+| Desktop side panels | `Sheet` |
+| Desktop word/sentence tap | `Popover` |
+| Fuzzy search | `Command` |
+| Tag selection | `Combobox` |
+| All notifications | `Sonner` |
+| All loading states | `Skeleton` |
+| Multiple choice | `Checkbox` |
+| List/grid toggle | `Toggle Group` |
+| Scrollable panels | `Scroll Area` |
+| Empty states | `Empty` |
+| OTP input | `Input OTP` |
+| Desktop nav | `Sidebar` |
+| Bookmark tabs | `Tabs` |
+| All chips/pills/badges | `Badge` (wrapped) |
 
-### Phase 1 — Core (v1)
-- Auth (login, register, onboarding, companion introduction, in-app tour)
+---
+
+## 21. Phased Rollout
+
+### Phase 1 — v1 (current scope)
+- Auth (login, register, Google OAuth, OTP, password reset)
+- Onboarding (companion introduction + in-app tour)
 - Dashboard (companion full size, hero board, stats, quick actions)
-- Add word (type + paste modes, buffer, verify flow)
-- Word library (list + card views, detail panel, search, filter)
-- Study session (all 5 exercise types, SM-2 engine, configure modes, end screen)
+- Add word (type + paste, buffer, verify flow, DWDS + Wiktionary + Gemini)
+- Word library (list + card views, detail, search, filter)
+- Study session (all 5 exercise types, SM-2, configure modes, end screen)
 - Reading module (library, reader, word/sentence tap, AI generation)
 - Documents (PDF reader, rich text editor + reader, annotations, vocabulary mining)
-- Companion (3D model, full dashboard presence, mini mode on other pages, chat)
-- Settings + Profile
+- Companion (3D model, dashboard full size, mini mode, chat)
+- Settings + Profile + Sustainability section
+- Feedback button + Sentry error tracking
 
 ### Phase 2 — Enrichment
-- Camera / OCR word capture (Scan mode)
-- Grammar engine (separate mode, per-word grammar drills)
-- Companion voice messages (ElevenLabs voice cloning)
+- Camera / OCR (Scan mode — Tesseract.js)
+- Grammar engine (separate study mode, per-word drills)
+- Offline support (local word cache, delayed verification queue, sync)
 
 ### Phase 3 — Delight
-- Floral / decorative UI layer on top of pastel base
+- Voice companion (ElevenLabs voice cloning)
+- Floral decorative UI layer on top of pastel base
 - Multi-user support (friends can join)
-- Leveled text generation in reading module
-- Advanced analytics and progress visualization
+- Custom domain + Resend SMTP for proper email
+
+---
+
+## 22. Infrastructure & Scaling
+
+### Current (free tiers — handles up to ~15 active users comfortably)
+- Vercel free — 100GB bandwidth/month
+- Supabase free — 500MB DB, 5GB bandwidth, Singapore region
+- Gemini AI Studio free — 1,500 requests/day, 15 req/min
+- Sentry free — 5,000 errors/month
+
+### When scaling to 60 people
+- Buy `germanlern.app` domain via Cloudflare (~€14/year)
+- Set up Resend free tier for proper email
+- Monitor Gemini daily request limit — 60 active users pushing limits on busy days
+
+### When needing more
+- Supabase Pro ($25/month) — removes pause, adds read replicas (Frankfurt for European dev performance)
+- Gemini paid tier if free limits exceeded
+
+---
+
+## 23. Sustainability
+
+Non-intrusive. Profile section only. Ko-fi link. Progress bar in IDR.
+
+Monthly costs at scale: ~€39/month (Supabase Pro + domain + Resend)
+Per person across 60 users: ~10,000 IDR (~€0.57)
+
+100% of contributions go to server and domain costs only.

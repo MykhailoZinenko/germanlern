@@ -1,16 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { SignUpForm } from '#/components/sign-up-form'
+import { RegisterForm } from '#/components/register-form'
 
-export const Route = createFileRoute('/sign-up')({
-  component: SignUp,
+export const Route = createFileRoute('/register')({
+  component: Register,
 })
 
-function SignUp() {
+function Register() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <SignUpForm />
+        <RegisterForm />
       </div>
     </div>
   )

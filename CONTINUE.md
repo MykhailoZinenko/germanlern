@@ -43,32 +43,67 @@ Progress tracking for GermanLern development.
 - Removed all dark mode CSS (no dark mode in v1)
 - Removed template classes (island-shell, feature-card, nav-link, etc.)
 
+### Phase 0b — File Naming Convention (2026-04-19)
+
+- Unified all file names to kebab-case (dominant convention)
+- Renamed: Header.tsx → header.tsx, Footer.tsx → footer.tsx
+- Renamed companion feature files: Companion.tsx → companion.tsx, CompanionScene.tsx → companion-scene.tsx, FurShell.tsx → fur-shell.tsx
+- Renamed companion hooks: useAnimationController → use-animation-controller, useCreatureGLTF → use-creature-gltf, useFurPhysics → use-fur-physics
+- Renamed WireframeExplorer.tsx → wireframe-explorer.tsx
+- Renamed routes: /sign-up → /register, /sign-up-success → /register-success
+- Renamed component: sign-up-form.tsx → register-form.tsx (export: RegisterForm)
+- Updated all internal imports
+
+### Phase 1a — Database Schema (2026-04-19)
+
+- Supabase CLI initialized (`supabase init`)
+- 10 migration files created in `supabase/migrations/` with sequential timestamps
+- All 17 tables from ADD.md section 17:
+  - `profiles` — extends auth.users via trigger auto-creation
+  - `settings` — companion name, language, daily goal, onboarding/tour flags
+  - `words` — full vocabulary with SM-2 fields, search_vector (trigger-based tsvector)
+  - `user_tags` + `word_user_tags` — many-to-many user tag system
+  - `word_buffer` — unverified words staging area
+  - `study_sessions` + `study_results` — study tracking
+  - `streaks` — streak tracking (one per user)
+  - `reading_texts` + `reading_word_events` — reading module
+  - `documents` + `document_images` + `annotations` + `document_word_events` — document module
+  - `feature_events` + `feedback` — analytics and user feedback
+- RLS enabled on all tables with `for all using (user_id = auth.uid())` pattern
+- Special RLS: word_user_tags via word ownership, study_results via session ownership, feedback allows any authenticated insert
+- Performance indexes on all key query paths
+- 4 database views: user_daily_stats, user_total_stats, words_due_today, word_stage_breakdown
+- Storage bucket `user-files` (private, signed URLs, user-scoped RLS)
+- TypeScript types generated at `src/types/database.ts`
+- Migrations pushed to remote via `supabase db push`
+
 ## Current State
 
-- App shell is minimal: Header with "GermanLern" branding + nav links, simple Footer
-- Index page is a placeholder ("Dashboard coming soon")
-- Auth routes exist from Supabase blocks (login, sign-up, forgot-password, update-password, protected)
-- No database tables created yet
-- No app shell layout (sidebar/bottom nav) yet
-- Companion renders at `/companion` (legacy route from earlier setup)
+- All database tables, RLS, indexes, views, and storage created and verified
+- Auth form components exist (login, register, forgot-password, update-password)
+- Auth routes exist with callback handlers (confirm, oauth, error)
+- Protected route layout exists (`_protected.tsx`) but no app shell yet
+- Index page is a public placeholder ("Dashboard coming soon")
+- No Google OAuth button wired yet
+- Redirect targets still point to `/protected` (needs → `/`)
+- Hardcoded localhost in forgot-password-form
+- No sidebar/bottom nav/app shell layout yet
 
-## Next Up — Phase 1: Database & Auth
+## Next Up — Phase 1b: Auth Flow
 
-See `docs/ROADMAP.md` for full v1 roadmap (9 phases).
+**Steps:**
+1. Fix redirect targets in auth forms (`/protected` → `/`)
+2. Fix hardcoded localhost URL in forgot-password-form
+3. Add Google OAuth button (social-auth.tsx component)
+4. Add authenticated user redirect from auth pages (require-anonymous.ts)
+5. Move index route under `_protected` layout
+6. Add Outlet component to `_protected.tsx`
 
-**Phase 1a — Database schema:**
-- All tables from ADD.md section 17 as Supabase migrations
-- RLS policies on every table
-- Supabase Storage bucket
+## After That — Phase 1c: App Shell
 
-**Phase 1b — Auth flow:**
-- Wire existing Supabase auth blocks
-- Google OAuth
-- Protected route guard (`_authed.tsx`)
-- Redirect logic
-
-**Phase 1c — App shell:**
-- Sidebar (desktop) + bottom nav (mobile) layout
-- All route stubs per ADD.md section 18
-- Companion mini placeholder
-- Feedback button
+**Steps:**
+1. Create shell feature directory (`src/features/shell/`)
+2. Build app-sidebar, app-bottom-nav, app-topbar, companion-mini, feedback-button
+3. Create all route stubs under `_protected/` with Empty state
+4. Wire app shell into `_protected.tsx`
+5. Cleanup deprecated files (header, footer, about)
