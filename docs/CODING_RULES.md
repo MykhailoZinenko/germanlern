@@ -9,16 +9,17 @@ Read the architecture document and design system document before making any deci
 
 - Framework: **TanStack Start** (built on Vite/Vinxi)
 - Routing: **TanStack Router** — file-based routing, built into TanStack Start
+- Auth blocks and Dropzone from Supabase shadcn library are compatible and should be used directly
 - All server-side logic lives in **TanStack Start server functions** (`createServerFn`) — not Supabase Edge Functions
-- Supabase Edge Functions used only for database-triggered webhooks (e.g. new user registration alert to Telegram) — nothing else
+- Supabase Edge Functions used only for database-triggered webhooks — nothing else
 - Auth, AI calls, file operations, feedback — all via server functions
 
 ---
 
 ## Code Style
 
-- TypeScript everywhere — no `.js` files, no `any`, no type assertions without justification
-- Use `unknown` and narrow properly instead of `any`
+- TypeScript everywhere — no `.js` files
+- No `any` — use `unknown` and narrow properly
 - Functional components only — no class components
 - Named exports for components, default export for pages/routes
 - DRY always — if something is written twice, extract it
@@ -27,7 +28,7 @@ Read the architecture document and design system document before making any deci
 - Never leave empty catch blocks — always handle errors meaningfully
 - No inline styles — Tailwind classes only
 - Keep components small and focused — split when a component exceeds ~100 lines
-- Co-locate component files with their styles and tests — no deep folder nesting
+- Co-locate component files with their styles and logic — no deep folder nesting
 
 ---
 
@@ -37,7 +38,7 @@ Read the architecture document and design system document before making any deci
 src/
   components/         # Shared reusable components
   routes/             # TanStack Router file-based routes
-    __root.tsx        # Root layout
+    __root.tsx
     index.tsx         # Dashboard
     words/
     study/
@@ -61,7 +62,7 @@ src/
   constants/          # All constant values, never inline
   types/              # Shared TypeScript types
 supabase/
-  functions/          # Only database-triggered webhooks
+  functions/          # Database-triggered webhooks only
   migrations/         # SQL migration files
 ```
 
@@ -78,36 +79,36 @@ supabase/
 - All AI calls via `createServerFn` — never call Gemini from the client
 - All sensitive Supabase operations via `createServerFn` — never expose service role key to client
 - All server functions validate the user session before processing
-- Every server function has try/catch with meaningful error response — never let a server error crash the UI silently
+- Every server function has try/catch with meaningful error response
 
 **Styling**
 - Tailwind + shadcn/ui only
 - Never override shadcn component internals — restyle via CSS variables and Tailwind only
 - Border radius always uses shadcn tokens (`--radius-sm/md/lg/xl/2xl/full`) — never hardcode pixel values
-- All semantic colors from the design system document — never invent new colors
+- All semantic colors from `DESIGN.md` — never invent new colors
 
 **State**
-- **Zustand** — client state only: companion animation state, buffer word count, tour step, UI modals, current page context
-- **TanStack Query** — server state only: all Supabase data fetching, caching, loading/error states
+- **Zustand** — client state only: companion animation state, buffer word count, tour step, UI modals
+- **TanStack Query** — server state only: all Supabase fetching, caching, loading/error states
 - Never store server data in Zustand
 - Never use TanStack Query for pure UI state
 - React `useState` for local component state
-- No prop drilling beyond 2 levels — use Zustand or TanStack Query
+- No prop drilling beyond 2 levels
 
 **Database**
 - Always go through Supabase client — never raw SQL in frontend
 - Every new table must have RLS policies before use
-- User can only read/write their own data via `user_id = auth.uid()`
+- User data isolated via `user_id = auth.uid()`
 
 **File uploads**
 - Always to Supabase Storage via server function
 - Never store binary data in the database
-- Storage buckets are private — access via signed URLs only
+- Storage buckets are private — signed URLs only
 
 **AI calls**
 - All AI calls in server functions via Gemini 2.0 Flash
 - All prompts request structured JSON output — never parse free text
-- Every AI call has try/catch with a meaningful fallback — never let AI failure crash the UI
+- Every AI call has try/catch with a meaningful fallback
 - Batch what can be batched — word verification sends all buffer words in one call
 - Study session questions generated in one upfront batch — no mid-session AI calls
 
@@ -130,15 +131,15 @@ supabase/
 
 | Use case | Component |
 |---|---|
-| Desktop modal | `Dialog` |
-| Mobile bottom sheet | `Drawer` |
-| Desktop side panel | `Sheet` |
+| Desktop modals | `Dialog` |
+| Mobile bottom sheets | `Drawer` |
+| Desktop side panels | `Sheet` |
 | Desktop word/sentence tap popup | `Popover` |
 | All text inputs | `Input` |
 | Multiline input | `Textarea` |
 | Fuzzy search | `Command` |
 | Tag selection | `Combobox` |
-| Transient notifications | `Sonner` |
+| All transient notifications | `Sonner` |
 | All loading states | `Skeleton` |
 | Progress indicators | `Progress` |
 | Settings toggles | `Switch` |
@@ -157,7 +158,7 @@ supabase/
 - `password-based-auth` — login and register forms
 - `social-auth` — Google OAuth button
 - `dropzone` — PDF upload, scan mode photo upload
-- Any router-specific code in blocks replaced with TanStack Router equivalents — never use React Router APIs
+- Any router-specific code in blocks replaced with TanStack Router equivalents
 
 **General**
 - `Drawer` for mobile, `Dialog` for desktop — never mix
@@ -189,10 +190,93 @@ supabase/
 
 ---
 
+## Wireframes
+
+### Where to find them
+
+All wireframes live in `src/sandbox/wireframe-explorer.tsx` and are accessible at `/sandbox/explorer` in the running app. The file contains a `TREE` array mapping screen IDs to components, and a `SCREENS` object mapping IDs to JSX. Every screen has both a mobile and desktop variant.
+
+Key wireframe components for the app shell:
+- `DSidebar` — desktop sidebar layout
+- `TBar` — desktop topbar
+- `MobTopBar` — mobile topbar
+- `MobBottomNav` — mobile bottom navigation
+- `DashMob` / `DashDesk` — dashboard layouts (use these to see how the shell wraps content)
+
+### Wireframe dimensions (DO NOT use literally)
+
+The wireframe explorer renders screens inside fixed-size frames:
+- **Desktop frame:** `DW = 820px`, `DH = 520px`
+- **Mobile frame:** `PW = 340px`, `PH = 700px`
+
+These are **scaled-down representations**, not real screen sizes.
+
+### How to scale wireframe values to real UI
+
+Real screens are larger than wireframe frames. Calculate the scale factor and multiply every wireframe value.
+
+**Desktop scale factor:** real viewport (~1440px) / wireframe width (820px) = **×1.756**
+**Mobile scale factor:** real viewport (~375px) / wireframe width (340px) = **×1.1**
+
+**Process for every wireframe value:**
+1. Read the exact pixel value from the wireframe component source code
+2. Multiply by the scale factor (×1.756 desktop, ×1.1 mobile)
+3. Map the result to the nearest existing design token (`--space-*`, `--radius-*`, Tailwind size class)
+4. If no token is close enough, **create a new CSS variable** in `src/styles.css` — never hardcode the pixel value in a component
+
+**Example — desktop topbar:**
+- Wireframe `TBar` height: `DTB = 48px`
+- Scaled: 48 × 1.756 = 84px
+- No existing token → created `--shell-topbar-h: 84px` in styles.css
+- Component uses `h-[var(--shell-topbar-h)]`
+
+**Example — desktop topbar title font:**
+- Wireframe `TBar` title fontSize: `13px`
+- Scaled: 13 × 1.756 = 23px
+- Nearest Tailwind class: `text-xl` (20px)
+- Component uses `text-xl`
+
+**Example — mobile bottom nav:**
+- Wireframe `MobBottomNav` height: `PBN = 50px`
+- Scaled: 50 × 1.1 = 55px
+- Created `--shell-bottomnav-h: 56px` in styles.css
+- Component uses `h-[var(--shell-bottomnav-h)]`
+
+### Shell layout tokens (already defined in `src/styles.css`)
+
+| Token | Value | Source |
+|---|---|---|
+| `--shell-topbar-h` | 84px | TBar DTB=48 × 1.756 |
+| `--shell-topbar-h-mobile` | 48px | MobTopBar 44 × 1.1 |
+| `--shell-bottomnav-h` | 56px | MobBottomNav PBN=50 × 1.1 |
+| `--shell-nav-indicator` | 3px | DSidebar borderLeft 2 × 1.756 |
+| `--shell-topbar-btn-h` | 53px | TBar Btn height 30 × 1.756 |
+| `--shell-topbar-btn-w` | 228px | TBar Btn width 130 × 1.756 |
+| `--shell-companion-mini-size` | 5rem | Companion mini 80×80 |
+
+### Breakpoint
+
+The universal mobile/desktop breakpoint is **1024px** (`lg:` in Tailwind). The `useIsMobile` hook in `src/hooks/use-mobile.ts` uses this same value. The shadcn `Sidebar` component reads this hook internally.
+
+- Below 1024px: mobile layout (topbar + bottom nav, no sidebar)
+- Above 1024px: desktop layout (sidebar + topbar, no bottom nav)
+
+### Rules
+
+1. **Read the wireframe source code** — open `wireframe-explorer.tsx`, find the component, read every style property
+2. **Scale every value** — desktop ×1.756, mobile ×1.1. Never use wireframe pixels literally
+3. **Map to tokens** — use existing `--space-*`, `--radius-*`, Tailwind classes. Create new CSS variables if nothing fits
+4. **Never hardcode pixel values in components** — all sizing goes through CSS variables or Tailwind classes
+5. **Never drop shadcn components** — customize via props, className, and CSS variable overrides. If a shadcn component exists for the job, use it
+6. **Check every element** — fonts, heights, widths, paddings, margins, border-radius, border-width. Missing one is a bug
+7. **Desktop and mobile are different scales** — the same wireframe element may need different Tailwind classes at `lg:` breakpoint vs default
+
+---
+
 ## What Not To Do
 
 - Do not add libraries not in the stack without asking
-- Do not create new design tokens — use only what the shadcn preset and design document define
+- Do not create new **color** tokens — use only what `DESIGN.md` and the shadcn preset define. Layout/sizing tokens (e.g. `--shell-*`) can be created in `src/styles.css` when no existing token matches a scaled wireframe value
 - Do not add features not in the architecture document
 - Do not use Supabase Edge Functions for anything handled by TanStack Start server functions
 - Do not call any AI API from the client — always server functions
@@ -200,3 +284,6 @@ supabase/
 - Do not use `any` — type everything properly
 - Do not put business logic in components — extract to hooks or server functions
 - Do not hardcode colors, radii, or spacing — use tokens
+- Do not use pixel values from wireframes as real measurements — always scale (×1.756 desktop, ×1.1 mobile)
+- Do not drop or replace shadcn components with hand-built alternatives — always customize via props and CSS variables
+- Do not guess sizes — read the wireframe source code, scale, and verify every element
