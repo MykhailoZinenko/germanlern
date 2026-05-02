@@ -1,27 +1,46 @@
-import { LayoutGrid, List, Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { Check, Filter, LayoutGrid, List, Search, SlidersHorizontal, X } from 'lucide-react'
 
-import { Input } from '#/components/ui/input'
+import { Button } from '#/components/ui/button'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '#/components/ui/dropdown-menu'
+import { Input } from '#/components/ui/input'
 import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
-import { useIsMobile } from '#/hooks/use-mobile'
+import { useWordStore } from '#/store/word-store'
 import type { WordFilters } from '#/features/words/api/words-server-fns'
 
 const STAGES = [
-  { value: '', label: 'All stages' },
-  { value: 'planted', label: 'Just Planted' },
-  { value: 'growing', label: 'Still Growing' },
-  { value: 'almost', label: 'Almost There' },
-  { value: 'mastered', label: 'Mastered' },
+  { value: '', label: 'All', emoji: '' },
+  { value: 'planted', label: 'Planted', emoji: '🌱' },
+  { value: 'growing', label: 'Growing', emoji: '🔄' },
+  { value: 'almost', label: 'Almost', emoji: '💪' },
+  { value: 'mastered', label: 'Mastered', emoji: '⭐' },
 ]
 
+const MOBILE_STAGE_DEFS = [
+  { value: 'planted', dot: 'bg-[var(--stage-planted-dot)]' },
+  { value: 'growing', dot: 'bg-[var(--stage-growing-dot)]' },
+  { value: 'almost', dot: 'bg-[var(--stage-almost-dot)]' },
+  { value: 'mastered', dot: 'bg-[var(--stage-mastered-dot)]' },
+]
+
+export type StageCounts = Record<string, number>
+
+const SORT_LABELS: Record<string, string> = {
+  date_added: 'Date added',
+  alpha: 'A → Z',
+  stage: 'Stage',
+  last_reviewed: 'Last reviewed',
+  next_review: 'Next review',
+}
+
 const WORD_TYPES = [
-  { value: '', label: 'All types' },
   { value: 'noun', label: 'Noun' },
   { value: 'verb', label: 'Verb' },
   { value: 'adjective', label: 'Adjective' },
@@ -29,91 +48,39 @@ const WORD_TYPES = [
   { value: 'other', label: 'Other' },
 ]
 
-const SORT_OPTIONS = [
-  { value: 'alpha', label: 'A \u2192 Z' },
-  { value: 'date_added', label: 'Date added' },
-  { value: 'next_review', label: 'Next review' },
-  { value: 'last_reviewed', label: 'Last reviewed' },
-]
-
 function ViewToggle({
   view,
   onViewChange,
-  compact,
 }: {
   view: 'list' | 'grid'
   onViewChange: (v: 'list' | 'grid') => void
-  compact?: boolean
 }) {
   return (
     <ToggleGroup
       type="single"
       value={view}
-      spacing={1}
       onValueChange={(v) => {
         if (v) onViewChange(v as 'list' | 'grid')
       }}
-      className={
-        compact
-          ? 'h-[var(--wl-search-h-desktop)] gap-0 rounded-[var(--radius-xl)] border border-[var(--border-medium)] bg-[var(--surface-page)] p-1.5'
-          : 'gap-0 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] p-0.5 lg:rounded-[var(--radius-xl)] lg:p-1'
-      }
+      className="gap-0 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-sunken)] p-1"
     >
       <ToggleGroupItem
         value="list"
         size="sm"
-        className={
-          compact
-            ? 'h-full w-12 rounded-[var(--radius-lg)] px-0 shadow-none'
-            : 'h-7 w-8 rounded-[var(--radius-md)] px-0 shadow-none lg:h-10 lg:w-12 lg:rounded-[var(--radius-lg)]'
-        }
+        className="h-8 gap-2 rounded-[var(--radius-sm)] px-3 text-sm data-[state=on]:border data-[state=on]:border-[var(--border-subtle)] data-[state=on]:bg-[var(--surface-raised)] data-[state=on]:text-[var(--text-primary)] data-[state=on]:shadow-none"
       >
-        <List className={compact ? 'size-5' : 'size-3.5 lg:size-5'} />
+        <List className="size-4" />
+        List
       </ToggleGroupItem>
       <ToggleGroupItem
         value="grid"
         size="sm"
-        className={
-          compact
-            ? 'h-full w-12 rounded-[var(--radius-lg)] px-0 shadow-none'
-            : 'h-7 w-8 rounded-[var(--radius-md)] px-0 shadow-none lg:h-10 lg:w-12 lg:rounded-[var(--radius-lg)]'
-        }
+        className="h-8 gap-2 rounded-[var(--radius-sm)] px-3 text-sm data-[state=on]:border data-[state=on]:border-[var(--border-subtle)] data-[state=on]:bg-[var(--surface-raised)] data-[state=on]:text-[var(--text-primary)] data-[state=on]:shadow-none"
       >
-        <LayoutGrid className={compact ? 'size-5' : 'size-3.5 lg:size-5'} />
+        <LayoutGrid className="size-4" />
+        Cards
       </ToggleGroupItem>
     </ToggleGroup>
-  )
-}
-
-const ALL_VALUE = '__all__'
-
-function FilterSelect({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string
-  options: Array<{ value: string; label: string }>
-  value: string
-  onChange: (v: string) => void
-}) {
-  return (
-    <Select
-      value={value || ALL_VALUE}
-      onValueChange={(v) => onChange(v === ALL_VALUE ? '' : v)}
-    >
-      <SelectTrigger className="h-7 shrink-0 gap-1 rounded-md border-[var(--border-subtle)] bg-[var(--surface-sunken)] px-2 text-[10px] text-[var(--text-muted)] lg:h-10 lg:rounded-[var(--radius-lg)] lg:px-4 lg:text-sm">
-        <SelectValue placeholder={label} />
-      </SelectTrigger>
-      <SelectContent align="start">
-        {options.map((opt) => (
-          <SelectItem key={opt.value || ALL_VALUE} value={opt.value || ALL_VALUE}>
-            {opt.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   )
 }
 
@@ -121,6 +88,7 @@ export function LibSearch({
   filters,
   onFiltersChange,
   wordCount,
+  stageCounts,
   view,
   onViewChange,
   compact,
@@ -128,52 +96,226 @@ export function LibSearch({
   filters: WordFilters
   onFiltersChange: (filters: WordFilters) => void
   wordCount: number
+  stageCounts?: StageCounts
   view: 'list' | 'grid'
   onViewChange: (v: 'list' | 'grid') => void
   compact?: boolean
 }) {
-  const isMobile = useIsMobile()
+  const mobileSearchOpen = useWordStore((s) => s.mobileSearchOpen)
+  const setMobileSearchOpen = useWordStore((s) => s.setMobileSearchOpen)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (mobileSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [mobileSearchOpen])
+
+  const handleCancelSearch = () => {
+    onFiltersChange({ ...filters, search: undefined })
+    setMobileSearchOpen(false)
+  }
 
   if (compact) {
     return (
-      <div className="flex h-[var(--shell-topbar-h)] shrink-0 items-center gap-3 border-b border-[var(--border-subtle)] bg-[var(--surface-page)] px-5">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-faint)]" />
+      <div className="shrink-0 border-b border-[var(--border-subtle)] p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-muted)]" />
           <Input
-            placeholder="Search..."
+            placeholder="Search…"
             value={filters.search ?? ''}
-            onChange={(e) => onFiltersChange({ ...filters, search: e.target.value || undefined })}
-            className="h-[var(--wl-search-h-desktop)] rounded-[var(--radius-xl)] pl-10 text-sm"
+            onChange={(e) =>
+              onFiltersChange({ ...filters, search: e.target.value || undefined })
+            }
+            className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] pl-10 text-base"
           />
         </div>
-        <ViewToggle view={view} onViewChange={onViewChange} compact />
       </div>
     )
   }
 
   return (
-    <div className="shrink-0 border-b border-[var(--border-subtle)] bg-[var(--surface-page)] px-4 pb-2 pt-2 lg:px-8 lg:pb-4 lg:pt-4">
-      <div className="relative mb-1.5 lg:mb-4">
-        <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--text-faint)] lg:left-4 lg:size-5" />
-        <Input
-          placeholder={isMobile ? 'Search...' : 'Search in German or Indonesian...'}
-          value={filters.search ?? ''}
-          onChange={(e) => onFiltersChange({ ...filters, search: e.target.value || undefined })}
-          className="h-[var(--wl-search-h)] rounded-[var(--radius-lg)] pl-8 text-[10px] lg:h-[var(--wl-search-h-desktop)] lg:rounded-[var(--radius-xl)] lg:pl-12 lg:text-sm"
-        />
+    <>
+      {/* ── Mobile ── */}
+      <div className="sticky top-0 z-10 shrink-0 bg-[var(--surface-raised)] lg:hidden">
+        {mobileSearchOpen && (
+          <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] px-4 py-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-muted)]" />
+              <Input
+                ref={searchInputRef}
+                placeholder="Search…"
+                value={filters.search ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, search: e.target.value || undefined })
+                }
+                className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] pl-10 pr-9 text-base"
+              />
+              {filters.search && (
+                <button
+                  onClick={() => onFiltersChange({ ...filters, search: undefined })}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <X className="size-4 text-[var(--text-muted)]" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleCancelSearch}
+              className="shrink-0 text-sm font-medium text-[var(--action-bg)]"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+        <div className="flex gap-2 overflow-x-auto border-b border-[var(--border-subtle)] px-4 py-3">
+          {mobileSearchOpen && (
+            <span className="inline-flex h-8 shrink-0 items-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-sunken)] px-3 text-sm text-[var(--text-primary)]">
+              All stages
+            </span>
+          )}
+          {MOBILE_STAGE_DEFS.map((s) => (
+            <button
+              key={s.value}
+              onClick={() =>
+                onFiltersChange({
+                  ...filters,
+                  stage: filters.stage === s.value ? undefined : s.value,
+                })
+              }
+              className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm ${
+                filters.stage === s.value
+                  ? 'border-[var(--border-strong)] bg-[var(--surface-sunken)] text-[var(--text-primary)]'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
+            >
+              <span className={`inline-block size-2.5 rounded-full ${s.dot}`} />
+              <span>{stageCounts?.[s.value] ?? 0}</span>
+            </button>
+          ))}
+        </div>
+        {mobileSearchOpen && filters.search && (
+          <div className="border-b border-[var(--border-subtle)] px-4 py-2">
+            <span className="text-xs text-[var(--text-muted)]">
+              {wordCount} result{wordCount !== 1 ? 's' : ''} for &ldquo;{filters.search}&rdquo;
+            </span>
+          </div>
+        )}
       </div>
-      <div className="flex items-center gap-1 lg:gap-2">
-        <FilterSelect label="Stage" options={STAGES} value={filters.stage ?? ''} onChange={(v) => onFiltersChange({ ...filters, stage: v || undefined })} />
-        <FilterSelect label="Type" options={WORD_TYPES} value={filters.wordType ?? ''} onChange={(v) => onFiltersChange({ ...filters, wordType: v || undefined })} />
-        {!isMobile && <FilterSelect label="Tags" options={[{ value: '', label: 'All tags' }]} value="" onChange={() => {}} />}
-        <FilterSelect label="Sort" options={SORT_OPTIONS} value={filters.sort ?? ''} onChange={(v) => onFiltersChange({ ...filters, sort: (v as WordFilters['sort']) || undefined })} />
-        <div className="ml-auto flex items-center gap-2 lg:gap-3">
-          <span className="text-[10px] text-[var(--text-faint)] lg:text-sm">
+
+      {/* ── Desktop ── */}
+      <div className="sticky top-0 z-10 hidden shrink-0 bg-[var(--surface-raised)] lg:block">
+        <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] px-8 py-4">
+          <div className="relative" style={{ width: 320 }}>
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              placeholder="Search German or Indonesian…"
+              value={filters.search ?? ''}
+              onChange={(e) =>
+                onFiltersChange({ ...filters, search: e.target.value || undefined })
+              }
+              className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] pl-10 text-base"
+            />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className={`h-10 gap-2 rounded-[var(--radius-md)] border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--text-secondary)] ${filters.wordType ? 'bg-[var(--surface-sunken)]' : ''}`}
+              >
+                <Filter className="size-4" />
+                Filters{filters.wordType ? ` · ${filters.wordType}` : ''}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[200px]">
+              <DropdownMenuLabel>Word type</DropdownMenuLabel>
+              {WORD_TYPES.map((wt) => (
+                <DropdownMenuItem
+                  key={wt.value}
+                  onClick={() =>
+                    onFiltersChange({
+                      ...filters,
+                      wordType: filters.wordType === wt.value ? undefined : wt.value,
+                    })
+                  }
+                  className={filters.wordType === wt.value ? 'font-medium' : ''}
+                >
+                  {wt.label}
+                  {filters.wordType === wt.value && <Check className="ml-auto size-4" />}
+                </DropdownMenuItem>
+              ))}
+              {filters.wordType && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => onFiltersChange({ ...filters, wordType: undefined })}
+                    className="text-[var(--text-muted)]"
+                  >
+                    Clear filter
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-10 gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium text-[var(--text-secondary)]"
+              >
+                <SlidersHorizontal className="size-4" />
+                Sort: {SORT_LABELS[filters.sort ?? 'date_added']}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {Object.entries(SORT_LABELS).map(([value, label]) => (
+                <DropdownMenuItem
+                  key={value}
+                  onClick={() =>
+                    onFiltersChange({ ...filters, sort: value as WordFilters['sort'] })
+                  }
+                  className={
+                    filters.sort === value || (!filters.sort && value === 'date_added')
+                      ? 'font-medium'
+                      : ''
+                  }
+                >
+                  {label}
+                  {(filters.sort === value || (!filters.sort && value === 'date_added')) && (
+                    <Check className="ml-auto size-4" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="flex-1" />
+          <span className="text-sm text-[var(--text-muted)]">
             {wordCount} word{wordCount !== 1 ? 's' : ''}
           </span>
           <ViewToggle view={view} onViewChange={onViewChange} />
         </div>
+        <div className="flex gap-2 border-b border-[var(--border-subtle)] px-8 py-3">
+          {STAGES.map((s) => {
+            const active = (filters.stage ?? '') === s.value
+            return (
+              <button
+                key={s.value}
+                onClick={() =>
+                  onFiltersChange({ ...filters, stage: s.value || undefined })
+                }
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-sm ${
+                  active
+                    ? 'border-[var(--border-strong)] bg-[var(--surface-sunken)] text-[var(--text-primary)]'
+                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                {s.emoji && <span className="mr-1">{s.emoji}</span>}
+                {s.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

@@ -5,7 +5,7 @@ import { getDueLabel, getWordStage } from '#/features/words/utils/stage'
 
 import { DueBadge } from './due-badge'
 import { StageDot } from './stage-dot'
-import { AiTagChip, GenderPill, TypeChip } from './word-chips'
+import { AiTagChip, GenderChip, TypeChip } from './word-chips'
 
 export function WordRowItem({
   word,
@@ -25,47 +25,42 @@ export function WordRowItem({
 
   if (compact) {
     return (
-      /* WLDeskDL compact row: pad=7 12→×1.756=12 21→py-3 px-5, gap=8→14→gap-3.5 */
-      /* word fs=11→19→text-base, translation fs=9→16→text-sm */
       <div
         onClick={onClick}
         className={cn(
-          'flex cursor-pointer items-center gap-3.5 border-b border-[var(--border-subtle)] px-5 py-3 transition-colors hover:bg-[var(--surface-hover)]',
+          'flex cursor-pointer items-center gap-3 border-b border-[var(--border-subtle)] px-4 py-3 transition-colors hover:bg-[var(--surface-hover)]',
           selected && 'bg-[var(--surface-sunken)]',
         )}
       >
         <StageDot stage={stage} />
         <div className="min-w-0 flex-1">
-          <p className={cn('truncate text-base text-[var(--text-primary)]', selected && 'font-medium')}>
+          <p className="truncate font-heading text-base text-[var(--text-primary)]">
             {word.german_word}
           </p>
-          <p className="truncate text-sm text-[var(--text-muted)]">
+          <p className="truncate text-[11px] text-[var(--text-muted)]">
             {word.translation}
           </p>
         </div>
+        <DueBadge due={due} />
       </div>
     )
   }
 
   if (isMobile) {
     return (
-      /* WLMobList row: pad=8 14→py-2 px-4, gap=8→8 */
       <div
         onClick={onClick}
         className={cn(
-          'flex cursor-pointer items-center gap-2 border-b border-[var(--border-subtle)] px-4 py-2 transition-colors hover:bg-[var(--surface-hover)]',
+          'flex cursor-pointer items-center gap-3 border-b border-[var(--border-subtle)] px-4 py-3 transition-colors hover:bg-[var(--surface-hover)]',
           selected && 'bg-[var(--surface-sunken)]',
         )}
       >
         <StageDot stage={stage} />
         <div className="min-w-0 flex-1">
-          <div className="mb-0.5 flex items-center gap-1">
-            <span className="text-sm font-medium text-[var(--text-primary)]">
-              {word.german_word}
-            </span>
-            <GenderPill gender={word.gender} />
-          </div>
-          <p className="truncate text-[10px] text-[var(--text-secondary)]">
+          <p className="truncate font-heading text-lg text-[var(--text-primary)]">
+            {word.german_word}
+          </p>
+          <p className="truncate text-sm text-[var(--text-secondary)]">
             {word.translation}
           </p>
         </div>
@@ -75,25 +70,27 @@ export function WordRowItem({
   }
 
   return (
-    /* WRow desktop full: pad=9 18→16 32→py-4 px-8, gap=10→18→gap-4 */
     <div
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center gap-4 border-b border-[var(--border-subtle)] px-8 py-4 transition-colors hover:bg-[var(--surface-hover)]',
+        'grid cursor-pointer items-center gap-4 border-b border-[var(--border-subtle)] px-8 py-4 transition-colors hover:bg-[var(--surface-hover)]',
         selected && 'bg-[var(--surface-sunken)]',
       )}
+      style={{ gridTemplateColumns: '24px 1.4fr 1fr auto auto' }}
     >
       <StageDot stage={stage} />
-      <span className="min-w-[var(--wl-word-col-min-w)] shrink-0 text-xl font-medium text-[var(--text-primary)]">
-        {word.german_word}
-      </span>
-      <GenderPill gender={word.gender} />
-      <TypeChip type={word.word_type} />
-      <span className="flex-1 truncate text-lg text-[var(--text-secondary)]">
+      <div className="flex min-w-0 items-baseline gap-3">
+        <span className="font-heading text-lg text-[var(--text-primary)]">
+          {word.german_word}
+        </span>
+        <GenderChip gender={word.gender} />
+        <TypeChip type={word.word_type} />
+      </div>
+      <p className="min-w-0 truncate text-base text-[var(--text-secondary)]">
         {word.translation}
-      </span>
+      </p>
       <div className="flex gap-2">
-        {tags.slice(0, 2).map((t) => (
+        {tags.slice(0, 1).map((t) => (
           <AiTagChip key={t} label={t} />
         ))}
       </div>

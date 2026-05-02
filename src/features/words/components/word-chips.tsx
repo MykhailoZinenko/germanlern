@@ -1,16 +1,15 @@
 import { Badge } from '#/components/ui/badge'
 import { STAGE_CONFIG, type WordStage } from '#/features/words/utils/stage'
+import { StageDot } from './stage-dot'
 
-/* Badge base: h-5 (20px), px-2, text-xs, rounded-lg
-   Desktop override: lg:h-7 (28px), lg:px-3, rounded-full for pill shape */
-const CHIP_OVERRIDE = 'rounded-full lg:h-7 lg:px-3'
+const CHIP = 'h-6 px-3 rounded-full text-[11px] font-medium'
 
-export function GenderPill({ gender }: { gender: string | null }) {
+export function GenderChip({ gender }: { gender: string | null }) {
   if (!gender) return null
   return (
     <Badge
       variant="outline"
-      className={`${CHIP_OVERRIDE} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
+      className={`${CHIP} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
     >
       {gender}
     </Badge>
@@ -22,7 +21,7 @@ export function TypeChip({ type }: { type: string | null }) {
   return (
     <Badge
       variant="outline"
-      className={`${CHIP_OVERRIDE} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
+      className={`${CHIP} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
     >
       {type}
     </Badge>
@@ -43,8 +42,12 @@ const STAGE_CLASSES: Record<WordStage, string> = {
 export function StageChip({ stage }: { stage: WordStage }) {
   const config = STAGE_CONFIG[stage]
   return (
-    <Badge variant="outline" className={`${CHIP_OVERRIDE} ${STAGE_CLASSES[stage]}`}>
-      {config.emoji} {config.label}
+    <Badge
+      variant="outline"
+      className={`${CHIP} gap-1 ${STAGE_CLASSES[stage]}`}
+    >
+      <StageDot stage={stage} className="size-[var(--wl-stage-dot)]" />
+      {config.label}
     </Badge>
   )
 }
@@ -53,7 +56,7 @@ export function AiTagChip({ label }: { label: string }) {
   return (
     <Badge
       variant="outline"
-      className={`${CHIP_OVERRIDE} border-[var(--lumi-border)] bg-[var(--lumi-lightest)] text-[var(--lumi-text)]`}
+      className={`${CHIP} border-[var(--status-info-border)] bg-[var(--status-info-bg)] text-[var(--status-info-text)]`}
     >
       {label}
     </Badge>
@@ -64,9 +67,41 @@ export function UserTagChip({ label }: { label: string }) {
   return (
     <Badge
       variant="outline"
-      className={`${CHIP_OVERRIDE} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
+      className={`${CHIP} border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]`}
     >
       {label}
+    </Badge>
+  )
+}
+
+export function SrcChip({ src }: { src: string | null }) {
+  if (!src || src === 'pending') return null
+  if (src === 'dwds' || src === 'wiktionary') {
+    return (
+      <Badge
+        variant="outline"
+        className={`${CHIP} border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]`}
+      >
+        {src === 'dwds' ? 'DWDS' : 'Wiktionary'}
+      </Badge>
+    )
+  }
+  if (src === 'ai_only') {
+    return (
+      <Badge
+        variant="outline"
+        className={`${CHIP} border-[var(--status-info-border)] bg-[var(--status-info-bg)] text-[var(--status-info-text)]`}
+      >
+        AI verified
+      </Badge>
+    )
+  }
+  return (
+    <Badge
+      variant="outline"
+      className={`${CHIP} border-[var(--status-error-border)] bg-[var(--status-error-bg)] text-[var(--status-error-text)]`}
+    >
+      Unverified
     </Badge>
   )
 }

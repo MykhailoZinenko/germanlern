@@ -16,9 +16,12 @@ export function StageDot({
   className?: string
 }) {
   return (
-    /* SDot: 8→mob 9→8→size-2, desk 14→14→size-3.5 */
     <span
-      className={cn('inline-block size-2 shrink-0 rounded-full lg:size-3.5', DOT_COLORS[stage], className)}
+      className={cn(
+        'inline-block size-[var(--wl-stage-dot)] shrink-0 rounded-full',
+        DOT_COLORS[stage],
+        className,
+      )}
     />
   )
 }
