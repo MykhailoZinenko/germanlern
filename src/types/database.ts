@@ -764,6 +764,8 @@ export type Database = {
           is_separable: boolean | null
           last_reviewed: string | null
           next_review_date: string | null
+          notes: string | null
+          custom_sentence: string | null
           plural_form: string | null
           review_count: number | null
           search_vector: unknown
@@ -794,6 +796,8 @@ export type Database = {
           is_separable?: boolean | null
           last_reviewed?: string | null
           next_review_date?: string | null
+          notes?: string | null
+          custom_sentence?: string | null
           plural_form?: string | null
           review_count?: number | null
           search_vector?: unknown
@@ -824,6 +828,8 @@ export type Database = {
           is_separable?: boolean | null
           last_reviewed?: string | null
           next_review_date?: string | null
+          notes?: string | null
+          custom_sentence?: string | null
           plural_form?: string | null
           review_count?: number | null
           search_vector?: unknown

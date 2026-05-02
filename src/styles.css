@@ -122,8 +122,55 @@
   --shell-bottomnav-h: 56px;
   --shell-nav-indicator: 3px;
   --shell-companion-mini-size: 5rem;
-  --shell-topbar-btn-h: 53px;
+  --shell-topbar-btn-h: 60px;
   --shell-topbar-btn-w: 228px;
+
+  /* ── Shared Component Sizes ── */
+  --btn-h-mobile: 38px;
+  --btn-h-desktop: 60px;
+  --field-h-desktop: 68px;
+  --chip-h-mobile: 22px;
+  --card-radius-mobile: 16px;
+
+  /* ── Add Word (aw/) ── */
+  --aw-modal-w: 632px;
+  --aw-modal-h: 560px;
+  --aw-tab-h: 48px;
+  --aw-buffer-h: 28px;
+  --aw-buffer-h-desktop: 48px;
+  --aw-tab-content-h: 232px;
+  --aw-tab-content-h-desktop: 372px;
+  --aw-drag-w: 56px;
+  --aw-textarea-h: 112px;
+  --aw-textarea-h-desktop: 176px;
+  --aw-scan-h: 120px;
+  --aw-scan-h-desktop: 192px;
+
+  /* ── Verify Flow (vf/) ── */
+  --vf-overlay-w: 632px;
+  --vf-card-radius: 28px;
+  --vf-card-py: 48px;
+  --vf-content-px: 44px;
+  --vf-loading-w: 668px;
+  --vf-review-w: 740px;
+  --vf-review-pt: 32px;
+  --vf-review-px: 36px;
+  --vf-review-pb: 40px;
+  --vf-done-w: 560px;
+  --vf-done-py: 56px;
+  --vf-progress-h: 10px;
+  --vf-progress-h-sm: 8px;
+  --vf-ai-row-h: 48px;
+
+  /* ── Word Library (wl/) ── */
+  --wl-search-h: 32px;
+  --wl-search-h-desktop: 60px;
+  --wl-filter-h: 24px;
+  --wl-filter-h-desktop: 40px;
+  --wl-detail-list-w: 440px;
+  --wl-card-strip-h: 3px;
+  --wl-word-col-min-w: 192px;
+  --wl-card-min-w: 220px;
 
   /* ── Shadows ── */
   --shadow-sm: 0 2px 8px rgba(60, 50, 30, 0.08);

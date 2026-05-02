@@ -73,47 +73,102 @@ Progress tracking for GermanLern development.
   - `companion-mini.tsx` — placeholder circle with pulsing dot
   - `feedback-button.tsx` — floating button with DD.md feedback tokens
 - All shell sizes scaled from wireframes (×1.756 desktop, ×1.1 mobile)
-- Shell layout tokens in `src/styles.css`: `--shell-topbar-h`, `--shell-topbar-h-mobile`, `--shell-bottomnav-h`, `--shell-topbar-btn-h/w`, `--shell-companion-mini-size`
-- Sidebar header height matches topbar height
+- Shell layout tokens in `src/styles.css`
 - Universal breakpoint: 1024px (`lg:`, `useIsMobile` hook updated)
 - Created 11 route stubs under `_protected/` with Empty state
 - Created `/onboarding` public route stub
-- Deleted deprecated: header.tsx, footer.tsx, about.tsx
-- All hardcoded values replaced with design tokens
-- Error text uses `--status-error-text` (not `text-red-500`)
-- Sonner toaster in app shell
 
-### Documentation Updates (2026-04-19)
+### Phase 2a — Add Word UI (2026-04-20)
 
-- CLAUDE.md: added wireframe section, updated project structure, breakpoint, database info, file naming, strict rules
-- CODING_RULES.md: complete wireframe methodology (scale factors, process, examples, token table, 7 rules)
+- Zustand store at `src/store/word-store.ts` for add/verify UI state
+- Buffer server functions with TanStack Query hooks
+- Duplicate detection server function checks both `words` and `word_buffer` tables
+- BookmarkTabs component (custom divs, proper bookmark visual style)
+- BufferBadge component with skeleton loading state
+- Tab contents: Type (word input + optional fields + autofocus), Scan (stub), Paste (multi-word textarea)
+- AddWordDrawer (mobile, flush edges, custom drag handle) + AddWordDialog (desktop, tabs visible via overflow-visible) + responsive wrapper
+- VerifyOverlay as centered Dialog on all screens (not bottom drawer)
+- Verify overlay only appears when add drawer/dialog is NOT open
+- Topbar "+Add words" button wired to Zustand store
+
+### Phase 2b — Verify Flow (2026-04-20)
+
+- Dictionary server function: DWDS API (prefers verb/noun entries for ambiguous words) → Wiktionary fallback → not_found
+- DWDS word type normalization uses `includes()` matching (catches Hilfsverb, Modalverb, etc.)
+- Gemini AI enrichment server function (`@google/genai` SDK, Gemini 3 Flash)
+- Verification pipeline: dictionary lookup (parallel) → Gemini batch → merge results
+- Original user input preserved in review — AI corrections shown as suggestions, not auto-applied
+- VerifyLoading screen with Progress bar + per-word status pills (shows buffer words during processing)
+- AiSuggestionRow component (accept applies suggestion, dismiss keeps original)
+- VerifyReview: word-by-word form with AI suggestions, Accept All, inline tag add/remove, Next/Finish
+- Save completes before Done screen appears (no race condition)
+- Post-verification duplicate check: words corrected by AI are checked against library before insert
+- VerifyDone screen: completion message + auto-close
+- SaveVerifiedWords: inserts to `words` table (including notes, custom_sentence), upserts user_tags, merges user raw tags with AI tags, deletes buffer entries
+- Errors propagated to user (not silently swallowed)
+- DB migration: added `notes` and `custom_sentence` columns to `words` table
+
+### Phase 2c — Word Library (2026-04-20)
+
+- Word server functions: `fetchWords` (ilike search on german_word + translation, stage/type/tag filters), `fetchWordById`, `deleteWord`
+- Tag server functions + hooks: `fetchUserTags`, `createTag`
+- Stage utility: `getWordStage()`, `getDueLabel()`, `STAGE_CONFIG`
+- Chip components (all wrap Badge): GenderPill, TypeChip, StageChip, AiTagChip, UserTagChip
+- StageDot + DueBadge components
+- LibSearch: search input + Select-based filter chips (Stage, Type, Sort) — uses shadcn Select, not DropdownMenu
+- WordRowItem (list view) + WordCardItem (card view, badges pinned to bottom with mt-auto)
+- WordDetail + WordDetailSkeleton: full word detail content with scrollable panel
+- GrammarSection: noun/verb/adjective grammar display
+- LearningStats: 2x2 grid of SM-2 stats
+- WordDetailPanel: desktop right panel with ScrollArea
+- `/words` route: full library with list/card toggle, search, filter, desktop split panel
+- `/words/$id` route: mobile word detail page (back/edit in shell topbar, no duplicate header)
+
+### Phase 2 — UI Polish (2026-04-20)
+
+- CSS variable audit: all hardcoded px values mapped to semantic CSS vars
+- Unified semantically similar values (btn heights, edit btn, buffer badge, AI row)
+- Unified control heights: topbar button, search input, toggle, edit button all 60px desktop; filter chips and toggle items both h-7 mobile / h-10 desktop
+- Compact split mode: search + toggle in single row (no duplicate "Word Library" header)
+- Surface color system: `surface-page` for main backgrounds, `surface-sunken` for shell chrome + inner UI cards, `surface-raised` for verify flow cards
+- Component misuse fixes: DropdownMenu → Select for filters, raw buttons → shadcn Button
+- Select viewport inner padding added
+- DrawerContent: `showDragHandle` prop added for custom handle control
 
 ## Current State
 
-- Full Phase 1 complete — database, auth, app shell all functional
-- Unauthenticated → redirects to `/login`
-- Authenticated → lands on `/` with sidebar (desktop) + bottom nav (mobile)
-- Google OAuth working (configured in Supabase + Google Cloud Console)
-- All nav items link to stub pages with Empty state
-- Companion mini placeholder visible bottom-right
-- Feedback button visible
-- All code verified against docs — no hardcoded values, correct tokens, proper shadcn usage
+- Full Phase 1 + Phase 2 complete (except items below)
+- Core add → buffer → verify → save pipeline working end-to-end
+- Word library with list/card views, search, stage/type filters, desktop split panel
+- Google OAuth working
+- Gemini API key configured in `.env.local`
 
-## Next Up — Phase 2: Word Pipeline
+## Phase 2 — Not Done / Known Issues
+
+- **Scan mode**: stub only (camera/OCR not implemented, Tesseract.js not added)
+- **Edit word**: button exists but no handler — needs edit form/flow
+- **Sorting**: implemented but buggy/not usable — needs rework
+- **Verification source filter**: not implemented
+- **Tags filter UI**: Select exists but no tag options loaded (needs to fetch user_tags)
+- **Skip verification option**: not implemented (AI-only fallback exists but no user-facing skip button)
+- **word_user_tags junction table**: not populated (tags saved directly to `ai_tags` column on words)
+- **UI rework planned**: user wants to redesign the word library and add word UI
+
+## Next Up — Phase 3: Study Engine
 
 See `docs/ROADMAP.md` for full details.
 
-**Phase 2a — Add word UI:**
-- Add word drawer (mobile) / dialog (desktop) with bookmark tabs
-- Type mode + paste mode
-- Buffer badge + buffer prompt
+**Phase 3a — SM-2 engine:**
+- Core algorithm: EF update, interval calculation, quality scoring
+- Queue logic: due words prioritized, new word mixing
+- Pure functions with tests
 
-**Phase 2b — Verify flow:**
-- DWDS + Wiktionary dictionary lookup server functions
-- Gemini AI enrichment server function
-- Verify overlay with word-by-word review
+**Phase 3b — Study configure:**
+- Auto / By tag / Ask companion modes with bookmark tabs
 
-**Phase 2c — Word library:**
-- List + card views with toggle
-- Word detail panel
-- Search + filter + sort
+**Phase 3c — Exercise UI:**
+- Single choice, multiple choice, translation, reverse translation, matching
+
+**Phase 3d — Session generation & results:**
+- Gemini generates all questions upfront
+- Results screen with positive framing

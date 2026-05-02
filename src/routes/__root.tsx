@@ -1,6 +1,8 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { useState } from 'react'
 
 import appCss from '../styles.css?url'
 
@@ -34,8 +36,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+        retry: 1,
+      },
+    },
+  }))
+
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Outlet />
       <TanStackDevtools
         config={{ position: 'bottom-right' }}
@@ -46,6 +57,6 @@ function RootComponent() {
           },
         ]}
       />
-    </>
+    </QueryClientProvider>
   )
 }
