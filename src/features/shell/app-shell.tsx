@@ -16,7 +16,7 @@ export function AppShell() {
       <AppSidebar />
       <SidebarInset className="relative">
         <AppTopbar />
-        <div className="relative flex-1 p-[var(--space-4)] pb-[calc(var(--shell-bottomnav-h)+var(--space-4))] lg:p-[var(--space-5)] lg:pb-[var(--space-5)]">
+        <div className="relative flex-1 p-[var(--shell-page-pad-x-mobile)] pb-[calc(var(--shell-bottomnav-h)+var(--shell-page-pad-x-mobile))] lg:p-[var(--shell-page-pad-x)] lg:pb-[var(--shell-page-pad-x)]">
           <Outlet />
           <VerifyFlow />
         </div>
