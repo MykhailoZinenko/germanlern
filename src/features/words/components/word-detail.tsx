@@ -1,13 +1,49 @@
+import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import {
+  Archive,
+  Leaf,
+  MoreHorizontal,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react'
+
+import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
+import { Card, CardContent } from '#/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '#/components/ui/dropdown-menu'
+import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 import { Skeleton } from '#/components/ui/skeleton'
+import { Textarea } from '#/components/ui/textarea'
+import { useIsMobile } from '#/hooks/use-mobile'
 import type { WordRow } from '#/features/words/api/words-server-fns'
+import {
+  useDeleteWord,
+  useMarkWordAsLeech,
+  useResetWordProgress,
+  useUpdateWord,
+} from '#/features/words/api/use-words'
 import { getWordStage } from '#/features/words/utils/stage'
 
 import { GrammarSection } from './grammar-section'
 import { LearningStats } from './learning-stats'
-import { AiTagChip, GenderPill, StageChip, TypeChip } from './word-chips'
+import {
+  AiTagChip,
+  GenderChip,
+  SrcChip,
+  StageChip,
+  TypeChip,
+} from './word-chips'
 
 export function WordDetail({ word }: { word: WordRow }) {
+  const [editing, setEditing] = useState(false)
   const stage = getWordStage(word)
   const altTranslations = word.alt_translations as string[] | null
   const exampleSentences = word.example_sentences as Array<{
@@ -15,68 +51,109 @@ export function WordDetail({ word }: { word: WordRow }) {
     de?: string
     translation?: string
   }> | null
-  const tags = word.ai_tags ?? []
+  const aiTags = word.ai_tags ?? []
+  const isMobile = useIsMobile()
+  const navigate = useNavigate()
+
+  const deleteMutation = useDeleteWord()
+  const resetMutation = useResetWordProgress()
+  const leechMutation = useMarkWordAsLeech()
+
+  const handleDelete = () => {
+    if (!window.confirm(`Delete "${word.german_word}"? This cannot be undone.`)) return
+    deleteMutation.mutate(word.id, {
+      onSuccess: () => {
+        if (isMobile) {
+          navigate({ to: '/words' })
+        }
+      },
+    })
+  }
+
+  const handleReset = () => {
+    resetMutation.mutate(word.id)
+  }
+
+  const handleLeech = () => {
+    leechMutation.mutate(word.id)
+  }
+
+  if (editing) {
+    return <WordEditForm word={word} onClose={() => setEditing(false)} />
+  }
 
   return (
-    <div>
-      {/* chips row: gap=5→mob 6→4, desk 9→8; mb≈6→mob 7→8, desk 11→12 */}
-      <div className="mb-2 flex flex-wrap items-center gap-1 lg:mb-3 lg:gap-2">
-        <GenderPill gender={word.gender} />
+    <div className="flex flex-col gap-5 p-6 lg:p-6">
+      <div className="flex flex-wrap gap-2">
+        <GenderChip gender={word.gender} />
         <TypeChip type={word.word_type} />
         <StageChip stage={stage} />
+        <SrcChip src={word.verification_source} />
       </div>
 
-      {/* title: fs=26→mob 29→text-2xl, desk 46→text-4xl; fw=500; mb=4→mob 4→4, desk 7→8 */}
-      <h2 className="mb-1 font-heading text-2xl font-medium text-[var(--text-primary)] lg:mb-2 lg:text-4xl">
-        {word.german_word}
-      </h2>
+      <div>
+        <h2 className="font-heading text-4xl font-semibold text-[var(--text-primary)]">
+          {word.german_word}
+        </h2>
+        <p className="mt-1 text-lg text-[var(--text-secondary)]">
+          {word.translation}
+        </p>
+      </div>
 
-      {/* subtitle: fs=13→mob 14→text-sm, desk 23→text-xl; mb=14→mob 15→16, desk 25→24 */}
-      <p className="mb-4 text-sm text-[var(--text-secondary)] lg:mb-6 lg:text-xl">
-        {word.translation}
-      </p>
-
-      {/* sections mb=12→mob 13→12, desk 21→20 */}
       {altTranslations && altTranslations.length > 0 && (
-        <div className="mb-3 lg:mb-5">
-          {/* Lbl: fs=9→mob 10→text-xs, desk 16→text-sm; mb=4→mob 4→4, desk 7→8 */}
-          <Label className="mb-1 text-xs lg:mb-2 lg:text-sm">Also means</Label>
-          {/* content: fs=10→mob 11→text-xs, desk 18→text-base */}
-          <p className="text-xs text-[var(--text-muted)] lg:text-sm">
-            {altTranslations.join(' \u00B7 ')}
-          </p>
+        <div>
+          <Label className="mb-2 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+            Also translates as
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {altTranslations.map((t) => (
+              <Badge
+                key={t}
+                variant="outline"
+                className="h-6 rounded-full border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] px-3 text-[11px] font-medium text-[var(--status-neutral-text)]"
+              >
+                {t}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
 
       {exampleSentences && exampleSentences.length > 0 && (
-        <div className="mb-3 lg:mb-5">
-          <Label className="mb-1 text-xs lg:mb-2 lg:text-sm">Example sentences</Label>
-          {exampleSentences.map((ex, i) => (
-            /* example: pad=7 10→mob 8 11→8 12, desk 12 18→12 16; r=8→mob 9→var(--radius-md), desk 14→var(--radius-xl); mb=5→mob 6→4, desk 9→8 */
-            <div
-              key={i}
-              className="mb-1 rounded-[var(--radius-md)] bg-[var(--surface-sunken)] p-2 px-3 lg:mb-2 lg:rounded-[var(--radius-xl)] lg:p-3 lg:px-4"
-            >
-              {/* german: fs=11→mob 12→text-xs, desk 19→text-base; mb=2→mob 2→2, desk 4→4 */}
-              <p className="text-xs text-[var(--text-primary)] lg:text-sm">
-                {ex.german ?? ex.de}
-              </p>
-              {/* indonesian: fs=9→mob 10→text-[10px], desk 16→text-sm */}
-              <p className="text-[10px] text-[var(--text-muted)] lg:text-xs">
-                {ex.translation}
-              </p>
-            </div>
-          ))}
+        <div>
+          <Label className="mb-2 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+            Examples
+          </Label>
+          <div className="flex flex-col gap-3">
+            {exampleSentences.map((ex, i) => (
+              <Card
+                key={i}
+                size="compact"
+                className="border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+              >
+                <CardContent className="p-4">
+                  <p className="font-heading text-base text-[var(--text-primary)]">
+                    {ex.german ?? ex.de}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--text-muted)]">
+                    {ex.translation}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
       <GrammarSection word={word} />
 
-      {tags.length > 0 && (
-        <div className="mb-3 lg:mb-5">
-          <Label className="mb-1 text-xs lg:mb-2 lg:text-sm">Tags</Label>
-          <div className="flex flex-wrap gap-1 lg:gap-2">
-            {tags.map((t) => (
+      {aiTags.length > 0 && (
+        <div>
+          <Label className="mb-2 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+            Tags
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {aiTags.map((t) => (
               <AiTagChip key={t} label={t} />
             ))}
           </div>
@@ -84,23 +161,195 @@ export function WordDetail({ word }: { word: WordRow }) {
       )}
 
       <LearningStats word={word} />
+
+      <div className="flex gap-2 pt-2">
+        <Button className="h-10 rounded-[var(--radius-md)] px-4 text-sm font-medium">
+          Study this word
+        </Button>
+        <Button
+          variant="outline"
+          className="h-10 rounded-[var(--radius-md)] border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--action-secondary-text)]"
+          onClick={() => setEditing(true)}
+        >
+          Edit
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-10 w-10 rounded-[var(--radius-md)] p-0"
+            >
+              <MoreHorizontal className="size-4 text-[var(--text-secondary)]" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[240px]">
+            <DropdownMenuItem onClick={handleReset} disabled={resetMutation.isPending}>
+              <RefreshCw className="mr-3 size-4" />
+              <div>
+                <div>Reset progress</div>
+                <div className="text-xs text-[var(--text-muted)]">
+                  Back to &lsquo;Just planted&rsquo;
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLeech} disabled={leechMutation.isPending}>
+              <Leaf className="mr-3 size-4" />
+              <div>
+                <div>Mark as leech</div>
+                <div className="text-xs text-[var(--text-muted)]">
+                  Flag a stuck word
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <Archive className="mr-3 size-4" />
+              <div>
+                <div>Archive</div>
+                <div className="text-xs text-[var(--text-muted)]">
+                  Hide from reviews
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+              className="text-[var(--status-error-text)] focus:text-[var(--status-error-text)]"
+            >
+              <Trash2 className="mr-3 size-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  )
+}
+
+function WordEditForm({
+  word,
+  onClose,
+}: {
+  word: WordRow
+  onClose: () => void
+}) {
+  const [germanWord, setGermanWord] = useState(word.german_word)
+  const [translation, setTranslation] = useState(word.translation ?? '')
+  const [altTranslations, setAltTranslations] = useState(
+    ((word.alt_translations as string[]) ?? []).join(', '),
+  )
+  const [notes, setNotes] = useState(word.notes ?? '')
+  const [customSentence, setCustomSentence] = useState(word.custom_sentence ?? '')
+
+  const updateMutation = useUpdateWord()
+
+  const handleSave = () => {
+    const altArr = altTranslations
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    updateMutation.mutate(
+      {
+        id: word.id,
+        german_word: germanWord,
+        translation,
+        alt_translations: altArr.length > 0 ? altArr : undefined,
+        notes: notes || null,
+        custom_sentence: customSentence || null,
+      },
+      { onSuccess: onClose },
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-6">
+      <h3 className="font-heading text-xl font-semibold text-[var(--text-primary)]">
+        Edit word
+      </h3>
+
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-[var(--text-muted)]">German word</Label>
+        <Input
+          value={germanWord}
+          onChange={(e) => setGermanWord(e.target.value)}
+          className="h-10 border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-[var(--text-muted)]">Translation</Label>
+        <Input
+          value={translation}
+          onChange={(e) => setTranslation(e.target.value)}
+          className="h-10 border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-[var(--text-muted)]">
+          Alternative translations (comma-separated)
+        </Label>
+        <Input
+          value={altTranslations}
+          onChange={(e) => setAltTranslations(e.target.value)}
+          className="h-10 border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+          placeholder="e.g. merindukan, rindu yang dalam"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-[var(--text-muted)]">Notes</Label>
+        <Textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="min-h-16 border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+          placeholder="Personal notes about this word…"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-[var(--text-muted)]">Custom sentence</Label>
+        <Textarea
+          value={customSentence}
+          onChange={(e) => setCustomSentence(e.target.value)}
+          className="min-h-16 border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+          placeholder="Your own example sentence…"
+        />
+      </div>
+
+      <div className="flex gap-2 pt-2">
+        <Button onClick={handleSave} disabled={updateMutation.isPending}>
+          {updateMutation.isPending ? 'Saving…' : 'Save'}
+        </Button>
+        <Button variant="outline" onClick={onClose} disabled={updateMutation.isPending}>
+          Cancel
+        </Button>
+      </div>
     </div>
   )
 }
 
 export function WordDetailSkeleton() {
   return (
-    <div>
-      <div className="mb-2 flex gap-1 lg:mb-3 lg:gap-2">
-        <Skeleton className="h-[var(--chip-h-mobile)] w-10 rounded-full lg:h-9 lg:w-16" />
-        <Skeleton className="h-[var(--chip-h-mobile)] w-12 rounded-full lg:h-9 lg:w-20" />
-        <Skeleton className="h-[var(--chip-h-mobile)] w-20 rounded-full lg:h-9 lg:w-28" />
+    <div className="flex flex-col gap-5 p-6">
+      <div className="flex gap-2">
+        <Skeleton className="h-6 w-10 rounded-full" />
+        <Skeleton className="h-6 w-14 rounded-full" />
+        <Skeleton className="h-6 w-24 rounded-full" />
       </div>
-      <Skeleton className="mb-1 h-8 w-40 lg:mb-2 lg:h-12 lg:w-60" />
-      <Skeleton className="mb-4 h-5 w-24 lg:mb-6 lg:h-6 lg:w-36" />
-      <Skeleton className="mb-3 h-16 w-full lg:mb-5 lg:h-20" />
-      <Skeleton className="mb-3 h-20 w-full lg:mb-5 lg:h-24" />
-      <Skeleton className="h-24 w-full lg:h-28" />
+      <div>
+        <Skeleton className="h-10 w-48" />
+        <Skeleton className="mt-2 h-5 w-32" />
+      </div>
+      <Skeleton className="h-20 w-full rounded-[var(--radius-xl)]" />
+      <Skeleton className="h-16 w-full rounded-[var(--radius-xl)]" />
+      <div className="grid grid-cols-2 gap-3">
+        <Skeleton className="h-16 rounded-[var(--radius-xl)]" />
+        <Skeleton className="h-16 rounded-[var(--radius-xl)]" />
+        <Skeleton className="h-16 rounded-[var(--radius-xl)]" />
+        <Skeleton className="h-16 rounded-[var(--radius-xl)]" />
+      </div>
     </div>
   )
 }
