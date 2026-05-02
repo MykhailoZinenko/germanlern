@@ -117,18 +117,18 @@
   --space-10: 40px;
 
   /* ── Shell Layout ── */
-  --shell-topbar-h: 84px;
-  --shell-topbar-h-mobile: 48px;
-  --shell-bottomnav-h: 56px;
-  --shell-nav-indicator: 3px;
+  --shell-topbar-h: 64px;
+  --shell-topbar-h-mobile: 56px;
+  --shell-bottomnav-h: 64px;
+  --shell-sidebar-w: 240px;
+  --shell-page-pad-x: 32px;
+  --shell-page-pad-x-mobile: 16px;
   --shell-companion-mini-size: 5rem;
-  --shell-topbar-btn-h: 60px;
-  --shell-topbar-btn-w: 228px;
 
-  /* ── Shared Component Sizes ── */
+  /* ── Shared Component Sizes (used by add-word/verify) ── */
   --btn-h-mobile: 38px;
-  --btn-h-desktop: 60px;
-  --field-h-desktop: 68px;
+  --btn-h-desktop: 48px;
+  --field-h-desktop: 48px;
   --chip-h-mobile: 22px;
   --card-radius-mobile: 16px;
 
@@ -163,14 +163,13 @@
   --vf-ai-row-h: 48px;
 
   /* ── Word Library (wl/) ── */
-  --wl-search-h: 32px;
-  --wl-search-h-desktop: 60px;
-  --wl-filter-h: 24px;
-  --wl-filter-h-desktop: 40px;
-  --wl-detail-list-w: 440px;
-  --wl-card-strip-h: 3px;
-  --wl-word-col-min-w: 192px;
-  --wl-card-min-w: 220px;
+  --wl-search-h: 40px;
+  --wl-filter-chip-h: 32px;
+  --wl-detail-list-w: 460px;
+  --wl-detail-cards-w: 620px;
+  --wl-card-strip-h: 4px;
+  --wl-card-min-w: 280px;
+  --wl-stage-dot: 10px;
 
   /* ── Shadows ── */
   --shadow-sm: 0 2px 8px rgba(60, 50, 30, 0.08);

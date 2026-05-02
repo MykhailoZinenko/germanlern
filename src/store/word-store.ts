@@ -23,6 +23,9 @@ interface WordStore {
   reviewIndex: number
   setReviewIndex: (i: number) => void
 
+  mobileSearchOpen: boolean
+  setMobileSearchOpen: (open: boolean) => void
+
   reset: () => void
 }
 
@@ -47,6 +50,9 @@ export const useWordStore = create<WordStore>((set) => ({
   reviewIndex: 0,
   setReviewIndex: (i) => set({ reviewIndex: i }),
 
+  mobileSearchOpen: false,
+  setMobileSearchOpen: (open) => set({ mobileSearchOpen: open }),
+
   reset: () =>
     set({
       addOpen: false,
@@ -54,5 +60,6 @@ export const useWordStore = create<WordStore>((set) => ({
       verifyOverlayOpen: false,
       verifyStep: 'idle',
       reviewIndex: 0,
+      mobileSearchOpen: false,
     }),
 }))
