@@ -173,3 +173,86 @@ export const deleteWord = createServerFn({ method: 'POST' })
 
     if (error) throw new Error(error.message)
   })
+
+export const resetWordProgress = createServerFn({ method: 'POST' })
+  .inputValidator((input: unknown) => input as { id: string })
+  .handler(async (ctx) => {
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('words')
+      .update({
+        review_count: 0,
+        easiness_factor: 2.5,
+        interval_days: 1,
+        next_review_date: null,
+        last_reviewed: null,
+      })
+      .eq('id', ctx.data.id)
+      .eq('user_id', user.id)
+
+    if (error) throw new Error(error.message)
+  })
+
+export const markWordAsLeech = createServerFn({ method: 'POST' })
+  .inputValidator((input: unknown) => input as { id: string })
+  .handler(async (ctx) => {
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { data: word, error: fetchError } = await supabase
+      .from('words')
+      .select('ai_tags')
+      .eq('id', ctx.data.id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (fetchError) throw new Error(fetchError.message)
+
+    const tags = (word.ai_tags as string[]) ?? []
+    if (tags.includes('leech')) return
+
+    const { error } = await supabase
+      .from('words')
+      .update({ ai_tags: [...tags, 'leech'] })
+      .eq('id', ctx.data.id)
+      .eq('user_id', user.id)
+
+    if (error) throw new Error(error.message)
+  })
+
+export const updateWord = createServerFn({ method: 'POST' })
+  .inputValidator(
+    (input: unknown) =>
+      input as {
+        id: string
+        german_word?: string
+        translation?: string
+        alt_translations?: string[]
+        notes?: string | null
+        custom_sentence?: string | null
+      },
+  )
+  .handler(async (ctx) => {
+    const { id, ...fields } = ctx.data
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('words')
+      .update(fields)
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (error) throw new Error(error.message)
+  })

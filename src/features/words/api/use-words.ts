@@ -5,6 +5,9 @@ import {
   deleteWord,
   fetchWordById,
   fetchWords,
+  markWordAsLeech,
+  resetWordProgress,
+  updateWord,
   type WordFilters,
 } from './words-server-fns'
 
@@ -31,6 +34,58 @@ export function useDeleteWord() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['words'] })
       toast.success('Word deleted')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export function useResetWordProgress() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => resetWordProgress({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['words'] })
+      toast.success('Progress reset to Just Planted')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export function useMarkWordAsLeech() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => markWordAsLeech({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['words'] })
+      toast.success('Word flagged as leech')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export function useUpdateWord() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      id: string
+      german_word?: string
+      translation?: string
+      alt_translations?: string[]
+      notes?: string | null
+      custom_sentence?: string | null
+    }) => updateWord({ data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['words'] })
+      toast.success('Word updated')
     },
     onError: (error) => {
       toast.error(error.message)

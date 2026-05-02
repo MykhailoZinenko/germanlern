@@ -28,6 +28,7 @@ import { Route as ProtectedWordsIndexRouteImport } from './routes/_protected/wor
 import { Route as ProtectedStudyIndexRouteImport } from './routes/_protected/study/index'
 import { Route as ProtectedReadIndexRouteImport } from './routes/_protected/read/index'
 import { Route as ProtectedDocumentsIndexRouteImport } from './routes/_protected/documents/index'
+import { Route as SandboxWireframesSplatRouteImport } from './routes/sandbox/wireframes/$'
 import { Route as ProtectedWordsIdRouteImport } from './routes/_protected/words/$id'
 import { Route as ProtectedStudySessionRouteImport } from './routes/_protected/study/session'
 import { Route as ProtectedReadIdRouteImport } from './routes/_protected/read/$id'
@@ -127,6 +128,11 @@ const ProtectedDocumentsIndexRoute = ProtectedDocumentsIndexRouteImport.update({
   path: '/documents/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const SandboxWireframesSplatRoute = SandboxWireframesSplatRouteImport.update({
+  id: '/sandbox/wireframes/$',
+  path: '/sandbox/wireframes/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedWordsIdRoute = ProtectedWordsIdRouteImport.update({
   id: '/words/$id',
   path: '/words/$id',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/read/$id': typeof ProtectedReadIdRoute
   '/study/session': typeof ProtectedStudySessionRoute
   '/words/$id': typeof ProtectedWordsIdRoute
+  '/sandbox/wireframes/$': typeof SandboxWireframesSplatRoute
   '/documents/': typeof ProtectedDocumentsIndexRoute
   '/read/': typeof ProtectedReadIndexRoute
   '/study/': typeof ProtectedStudyIndexRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/read/$id': typeof ProtectedReadIdRoute
   '/study/session': typeof ProtectedStudySessionRoute
   '/words/$id': typeof ProtectedWordsIdRoute
+  '/sandbox/wireframes/$': typeof SandboxWireframesSplatRoute
   '/documents': typeof ProtectedDocumentsIndexRoute
   '/read': typeof ProtectedReadIndexRoute
   '/study': typeof ProtectedStudyIndexRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/_protected/read/$id': typeof ProtectedReadIdRoute
   '/_protected/study/session': typeof ProtectedStudySessionRoute
   '/_protected/words/$id': typeof ProtectedWordsIdRoute
+  '/sandbox/wireframes/$': typeof SandboxWireframesSplatRoute
   '/_protected/documents/': typeof ProtectedDocumentsIndexRoute
   '/_protected/read/': typeof ProtectedReadIndexRoute
   '/_protected/study/': typeof ProtectedStudyIndexRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/read/$id'
     | '/study/session'
     | '/words/$id'
+    | '/sandbox/wireframes/$'
     | '/documents/'
     | '/read/'
     | '/study/'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/read/$id'
     | '/study/session'
     | '/words/$id'
+    | '/sandbox/wireframes/$'
     | '/documents'
     | '/read'
     | '/study'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/_protected/read/$id'
     | '/_protected/study/session'
     | '/_protected/words/$id'
+    | '/sandbox/wireframes/$'
     | '/_protected/documents/'
     | '/_protected/read/'
     | '/_protected/study/'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   AuthOauthRoute: typeof AuthOauthRoute
   SandboxExplorerRoute: typeof SandboxExplorerRoute
   SandboxRegistryRoute: typeof SandboxRegistryRoute
+  SandboxWireframesSplatRoute: typeof SandboxWireframesSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDocumentsIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/sandbox/wireframes/$': {
+      id: '/sandbox/wireframes/$'
+      path: '/sandbox/wireframes/$'
+      fullPath: '/sandbox/wireframes/$'
+      preLoaderRoute: typeof SandboxWireframesSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected/words/$id': {
       id: '/_protected/words/$id'
       path: '/words/$id'
@@ -524,6 +544,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthOauthRoute: AuthOauthRoute,
   SandboxExplorerRoute: SandboxExplorerRoute,
   SandboxRegistryRoute: SandboxRegistryRoute,
+  SandboxWireframesSplatRoute: SandboxWireframesSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

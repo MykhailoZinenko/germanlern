@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { BookOpen } from 'lucide-react'
 
@@ -13,7 +13,8 @@ import { Skeleton } from '#/components/ui/skeleton'
 import { useIsMobile } from '#/hooks/use-mobile'
 import { useWords } from '#/features/words/api/use-words'
 import type { WordFilters } from '#/features/words/api/words-server-fns'
-import { LibSearch } from '#/features/words/components/lib-search'
+import { getWordStage } from '#/features/words/utils/stage'
+import { LibSearch, type StageCounts } from '#/features/words/components/lib-search'
 import { WordCardItem } from '#/features/words/components/word-card'
 import { WordDetailPanel } from '#/features/words/components/word-detail-panel'
 import { WordRowItem } from '#/features/words/components/word-row'
@@ -29,8 +30,18 @@ function WordLibrary() {
   const isMobile = useIsMobile()
   const navigate = useNavigate()
 
+  const { data: allWords } = useWords({})
   const { data: words, isLoading } = useWords(filters)
   const selectedWord = words?.find((w) => w.id === selectedId)
+
+  const stageCounts = useMemo<StageCounts>(() => {
+    if (!allWords) return {}
+    const counts: StageCounts = { planted: 0, growing: 0, almost: 0, mastered: 0 }
+    for (const w of allWords) {
+      counts[getWordStage(w)]++
+    }
+    return counts
+  }, [allWords])
 
   const handleWordClick = (id: string) => {
     if (isMobile) {
@@ -42,15 +53,25 @@ function WordLibrary() {
 
   const wordCount = words?.length ?? 0
   const inSplitMode = !!selectedId && !isMobile
+  const railWidth = view === 'list' ? 'var(--wl-detail-list-w)' : 'var(--wl-detail-cards-w)'
 
   return (
-    <div className={`-m-[var(--space-4)] flex h-[calc(100vh-var(--shell-topbar-h-mobile)-var(--shell-bottomnav-h))] lg:-m-[var(--space-5)] lg:h-[calc(100vh-var(--shell-topbar-h))] ${inSplitMode ? '-mt-[calc(var(--space-5)+var(--shell-topbar-h))] flex-row lg:h-[calc(100vh)]' : 'flex-col'}`}>
-      {/* Left panel: full width normally, 440px in split mode */}
-      <div className={`flex flex-col overflow-hidden ${inSplitMode ? 'w-[var(--wl-detail-list-w)] shrink-0' : 'flex-1'}`}>
+    <div
+      className={`-m-[var(--shell-page-pad-x-mobile)] flex h-[calc(100dvh-var(--shell-topbar-h-mobile)-var(--shell-bottomnav-h))] flex-col lg:-m-[var(--shell-page-pad-x)] lg:h-[calc(100dvh-var(--shell-topbar-h))] ${
+        inSplitMode ? 'flex-row' : ''
+      }`}
+    >
+      <div
+        className={`flex min-h-0 min-w-0 flex-col ${
+          inSplitMode ? 'shrink-0' : 'flex-1'
+        }`}
+        style={inSplitMode ? { width: railWidth } : undefined}
+      >
         <LibSearch
           filters={filters}
           onFiltersChange={setFilters}
           wordCount={wordCount}
+          stageCounts={stageCounts}
           view={view}
           onViewChange={setView}
           compact={inSplitMode}
@@ -85,13 +106,12 @@ function WordLibrary() {
                 />
               ))
             ) : (
-              <div className="grid grid-cols-2 gap-1.5 p-2.5">
+              <div className="grid grid-cols-2 gap-3 p-4" style={{ alignContent: 'start' }}>
                 {words.map((w) => (
                   <WordCardItem
                     key={w.id}
                     word={w}
                     selected={w.id === selectedId}
-                    compact
                     onClick={() => handleWordClick(w.id)}
                   />
                 ))}
@@ -110,8 +130,13 @@ function WordLibrary() {
             ))}
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-3 lg:px-8 lg:py-5">
-            <div className="grid grid-cols-2 gap-2 lg:grid-cols-[repeat(auto-fill,minmax(var(--wl-card-min-w),1fr))] lg:gap-4">
+          <div className="flex-1 overflow-y-auto px-8 py-5">
+            <div
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: `repeat(auto-fill, minmax(var(--wl-card-min-w), 1fr))`,
+              }}
+            >
               {words.map((w) => (
                 <WordCardItem
                   key={w.id}
@@ -139,13 +164,13 @@ function WordListSkeleton({ view }: { view: 'list' | 'grid' }) {
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-2 border-b border-[var(--border-subtle)] px-4 py-2 lg:gap-4 lg:px-8 lg:py-4"
+            className="flex items-center gap-4 border-b border-[var(--border-subtle)] px-8 py-4"
           >
-            <Skeleton className="size-2 rounded-full lg:size-3.5" />
-            <Skeleton className="h-4 w-24 lg:h-6 lg:w-40" />
-            <Skeleton className="h-4 w-10 lg:h-5 lg:w-14" />
-            <Skeleton className="h-4 flex-1 lg:h-5" />
-            <Skeleton className="h-5 w-12 rounded-full lg:h-7 lg:w-16" />
+            <Skeleton className="size-[var(--wl-stage-dot)] rounded-full" />
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-5 w-10" />
+            <Skeleton className="h-5 flex-1" />
+            <Skeleton className="h-6 w-16 rounded-full" />
           </div>
         ))}
       </div>
@@ -153,18 +178,26 @@ function WordListSkeleton({ view }: { view: 'list' | 'grid' }) {
   }
 
   return (
-    <div className="flex-1 overflow-hidden p-3 lg:px-8 lg:py-5">
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-[repeat(auto-fill,minmax(var(--wl-card-min-w),1fr))] lg:gap-4">
+    <div className="flex-1 overflow-hidden px-8 py-5">
+      <div
+        className="grid gap-4"
+        style={{
+          gridTemplateColumns: `repeat(auto-fill, minmax(var(--wl-card-min-w), 1fr))`,
+        }}
+      >
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] lg:rounded-[var(--radius-2xl)]"
+            className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-subtle)]"
           >
-            <Skeleton className="h-[var(--wl-card-strip-h)] w-full lg:h-1" />
-            <div className="space-y-2 p-2.5 lg:space-y-3 lg:px-5 lg:py-4">
-              <Skeleton className="h-4 w-20 lg:h-6 lg:w-28" />
-              <Skeleton className="h-4 w-12 lg:h-5 lg:w-16" />
-              <Skeleton className="h-4 w-16 lg:h-5 lg:w-20" />
+            <Skeleton className="h-[var(--wl-card-strip-h)] w-full" />
+            <div className="flex flex-col gap-3 p-5">
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-10 rounded-full" />
+                <Skeleton className="h-6 w-14 rounded-full" />
+              </div>
+              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-5 w-20" />
             </div>
           </div>
         ))}
