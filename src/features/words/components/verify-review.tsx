@@ -79,15 +79,28 @@ export function VerifyReview({
   })
 
   const handleAcceptAll = () => {
-    const ai = current.aiEnrichment
-    setFields((f) => ({
-      ...f,
-      germanWord: ai.spellingCorrection || f.germanWord,
-      translation: ai.suggestedTranslation || f.translation,
-      spellingAccepted: true,
-      translationAccepted: true,
-    }))
-    setDismissed({ spelling: true, translation: true })
+    const finalWords = verifiedWords.map((word, i) => {
+      const ai = word.aiEnrichment
+      if (i === reviewIndex) {
+        return {
+          ...word,
+          germanWord: ai.spellingCorrection || fields.germanWord,
+          aiEnrichment: {
+            ...ai,
+            suggestedTranslation: ai.suggestedTranslation || fields.translation,
+          },
+        }
+      }
+      return {
+        ...word,
+        germanWord: ai.spellingCorrection || word.germanWord,
+        aiEnrichment: {
+          ...ai,
+          suggestedTranslation: ai.suggestedTranslation || word.userTranslation || '',
+        },
+      }
+    })
+    onFinish(finalWords)
   }
 
   const handleNext = () => {
@@ -268,10 +281,10 @@ export function VerifyReview({
 
         {/* buttons: h=34→mob 37→38, desk 60→var(--vf-btn-h); gap=8→mob 9→8, desk 14→16 */}
         <div className="flex gap-2 lg:gap-4">
-          <Button variant="outline" className="h-[var(--btn-h-mobile)] flex-1 rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg" onClick={handleAcceptAll} disabled={isSaving}>
+          <Button variant="outline" className="h-[var(--btn-h-mobile)] flex-1 text-xs lg:h-[var(--btn-h-desktop)] lg:text-lg" onClick={handleAcceptAll} disabled={isSaving}>
             Accept all
           </Button>
-          <Button className="h-[var(--btn-h-mobile)] flex-1 rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg" onClick={handleNext} disabled={isSaving}>
+          <Button className="h-[var(--btn-h-mobile)] flex-1 text-xs lg:h-[var(--btn-h-desktop)] lg:text-lg" onClick={handleNext} disabled={isSaving}>
             {isSaving ? 'Saving...' : isLast ? 'Finish' : 'Next word \u2192'}
           </Button>
         </div>

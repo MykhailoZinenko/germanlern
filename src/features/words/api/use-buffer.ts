@@ -10,6 +10,7 @@ import {
   deleteBufferWord,
   fetchBufferWords,
 } from './buffer-server-fns'
+import { extractWordsFromText } from './gemini-server-fns'
 
 export function useBufferWords() {
   const setBufferCount = useWordStore((s) => s.setBufferCount)
@@ -89,6 +90,15 @@ export function useClearBuffer() {
       setBufferCount(0)
       queryClient.invalidateQueries({ queryKey: ['buffer-words'] })
     },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export function useExtractWords() {
+  return useMutation({
+    mutationFn: (text: string) => extractWordsFromText({ data: { text } }),
     onError: (error) => {
       toast.error(error.message)
     },

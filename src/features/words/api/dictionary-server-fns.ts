@@ -100,11 +100,12 @@ function normalizeWordType(raw?: string): string | undefined {
 export const lookupWord = createServerFn({ method: 'POST' })
   .inputValidator((input: unknown) => input as { word: string })
   .handler(async (ctx): Promise<DictionaryResult> => {
-    const dwds = await lookupDWDS(ctx.data.word)
+    const [dwds, wikt] = await Promise.all([
+      lookupDWDS(ctx.data.word),
+      lookupWiktionary(ctx.data.word),
+    ])
+
     if (dwds) return dwds
-
-    const wikt = await lookupWiktionary(ctx.data.word)
     if (wikt) return wikt
-
     return { found: false, source: 'not_found' }
   })
