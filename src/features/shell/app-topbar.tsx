@@ -35,7 +35,7 @@ export function AppTopbar() {
         <header className="sticky top-0 z-20 flex h-[var(--shell-topbar-h-mobile)] shrink-0 items-center gap-3 border-b border-[var(--border-subtle)] bg-[var(--surface-raised)] px-[var(--shell-page-pad-x-mobile)] lg:hidden">
           <Button
             variant="ghost"
-            className="h-10 w-10 rounded-[var(--radius-md)] p-0"
+            className="h-10 w-10 p-0"
             onClick={() => navigate({ to: '/words' })}
           >
             <ArrowLeft className="size-5 text-[var(--text-secondary)]" />
@@ -55,7 +55,7 @@ export function AppTopbar() {
           </div>
           <Button
             id="btn-add-words"
-            className="h-10 gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+            className="h-10 gap-2 px-4 text-sm font-medium"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="size-4" />
@@ -76,7 +76,7 @@ export function AppTopbar() {
         </div>
         <Button
           id="btn-add-words"
-          className="h-10 gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+          className="h-10 gap-2 px-4 text-sm font-medium"
           onClick={() => setAddOpen(true)}
         >
           <Plus className="size-4" />
@@ -99,14 +99,14 @@ export function AppTopbar() {
           <>
             <Button
               variant="ghost"
-              className="h-10 w-10 rounded-[var(--radius-md)] p-0"
+              className="h-10 w-10 p-0"
               onClick={() => setMobileSearchOpen(true)}
             >
               <Search className="size-5 text-[var(--text-secondary)]" />
             </Button>
             <Button
               variant="ghost"
-              className="h-10 w-10 rounded-[var(--radius-md)] p-0"
+              className="h-10 w-10 p-0"
               onClick={() => setAddOpen(true)}
             >
               <Plus className="size-5 text-[var(--text-secondary)]" />
@@ -123,7 +123,7 @@ export function AppTopbar() {
         </div>
         <Button
           id="btn-add-words"
-          className="h-10 gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+          className="h-10 gap-2 px-4 text-sm font-medium"
           onClick={() => setAddOpen(true)}
         >
           <Plus className="size-4" />

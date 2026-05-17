@@ -163,12 +163,12 @@ export function WordDetail({ word }: { word: WordRow }) {
       <LearningStats word={word} />
 
       <div className="flex gap-2 pt-2">
-        <Button className="h-10 rounded-[var(--radius-md)] px-4 text-sm font-medium">
+        <Button className="h-10 px-4 text-sm font-medium">
           Study this word
         </Button>
         <Button
           variant="outline"
-          className="h-10 rounded-[var(--radius-md)] border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--action-secondary-text)]"
+          className="h-10 border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--action-secondary-text)]"
           onClick={() => setEditing(true)}
         >
           Edit
@@ -177,7 +177,7 @@ export function WordDetail({ word }: { word: WordRow }) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="h-10 w-10 rounded-[var(--radius-md)] p-0"
+              className="h-10 w-10 p-0"
             >
               <MoreHorizontal className="size-4 text-[var(--text-secondary)]" />
             </Button>

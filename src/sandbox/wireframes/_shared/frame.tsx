@@ -145,7 +145,9 @@ export function Frame({ kind, children }: FrameProps) {
               germanlern.app
             </div>
           </div>
-          {children}
+          <div style={{ width: target.w, height: target.h, overflow: "hidden" }}>
+            {children}
+          </div>
         </div>
       </div>
     </div>

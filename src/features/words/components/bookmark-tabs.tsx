@@ -18,10 +18,10 @@ export function BookmarkTabs() {
             aria-selected={active}
             onClick={() => setActiveTab(tab)}
             className={[
-              'relative cursor-pointer select-none rounded-t-[var(--radius-md)] border border-[var(--border-subtle)] text-[11px] lg:rounded-t-[var(--radius-xl)] lg:text-base',
+              'relative cursor-pointer select-none rounded-t-[var(--radius-md)] border border-[var(--border-subtle)] text-sm',
               active
-                ? 'z-[2] border-b-[var(--surface-page)] bg-[var(--surface-page)] px-[22px] pb-2.5 pt-2 font-medium text-[var(--text-primary)] lg:px-9 lg:pb-4 lg:pt-4'
-                : 'z-[1] border-b-0 bg-[var(--surface-sunken)] px-[18px] pb-2.5 pt-1.5 font-normal text-[var(--text-faint)] lg:px-8 lg:pb-4 lg:pt-3',
+                ? 'z-[2] border-b-[var(--surface-page)] bg-[var(--surface-page)] px-5 pb-2 pt-4 font-semibold text-[var(--text-primary)]'
+                : 'z-[1] border-b-0 bg-[var(--surface-sunken)] px-4 pb-2 pt-2 font-normal text-[var(--text-faint)]',
             ].join(' ')}
           >
             {TAB_LABELS[tab]}

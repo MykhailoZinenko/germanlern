@@ -1,20 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { GraduationCap } from 'lucide-react'
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '#/components/ui/empty'
+import { StudyConfigure } from '#/features/study/components/study-configure'
 
 export const Route = createFileRoute('/_protected/study/')({
-  component: StudyConfigure,
+  component: StudyConfigurePage,
 })
 
-function StudyConfigure() {
+function StudyConfigurePage() {
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon"><GraduationCap /></EmptyMedia>
-        <EmptyTitle>Study</EmptyTitle>
-        <EmptyDescription>Study sessions are coming soon.</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <div className="flex flex-1 items-start justify-center px-[var(--shell-page-pad-x-mobile)] py-5 lg:items-center lg:px-[var(--shell-page-pad-x)] lg:py-8">
+      <StudyConfigure />
+    </div>
   )
 }

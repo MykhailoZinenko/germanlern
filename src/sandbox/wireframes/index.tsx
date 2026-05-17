@@ -17,6 +17,21 @@ import { WLMobileDetailMenu } from "./word-library/mobile-detail-menu";
 import { WLMobileFilters } from "./word-library/mobile-filters";
 import { WLMobileSearch } from "./word-library/mobile-search";
 
+import { AWDesktopType } from "./add-flow/desktop-type";
+import { AWDesktopScanEmpty } from "./add-flow/desktop-scan-empty";
+import { AWDesktopScanOcr } from "./add-flow/desktop-scan-ocr";
+import { AWDesktopScanResults } from "./add-flow/desktop-scan-results";
+import { AWDesktopPasteEmpty } from "./add-flow/desktop-paste-empty";
+import { AWDesktopPasteParsed } from "./add-flow/desktop-paste-parsed";
+import { AWDesktopBufferOverlay } from "./add-flow/desktop-buffer-overlay";
+import { AWMobileType } from "./add-flow/mobile-type";
+import { AWMobileScanEmpty } from "./add-flow/mobile-scan-empty";
+import { AWMobileScanOcr } from "./add-flow/mobile-scan-ocr";
+import { AWMobileScanResults } from "./add-flow/mobile-scan-results";
+import { AWMobilePasteEmpty } from "./add-flow/mobile-paste-empty";
+import { AWMobilePasteParsed } from "./add-flow/mobile-paste-parsed";
+import { AWMobileBufferOverlay } from "./add-flow/mobile-buffer-overlay";
+
 export type Surface = "desktop" | "mobile";
 
 export interface ScreenDef {
@@ -48,6 +63,26 @@ export const SECTIONS: SectionDef[] = [
       { slug: "mobile-detail-menu", title: "Mobile · detail (menu)", surface: "mobile", Component: WLMobileDetailMenu },
       { slug: "mobile-search", title: "Mobile · search", surface: "mobile", Component: WLMobileSearch },
       { slug: "mobile-filters", title: "Mobile · filters", surface: "mobile", Component: WLMobileFilters },
+    ],
+  },
+  {
+    slug: "add-flow",
+    title: "Add word flow",
+    screens: [
+      { slug: "desktop-type", title: "Desktop · type tab", surface: "desktop", Component: AWDesktopType },
+      { slug: "desktop-scan-empty", title: "Desktop · scan (empty)", surface: "desktop", Component: AWDesktopScanEmpty },
+      { slug: "desktop-scan-ocr", title: "Desktop · scan (OCR running)", surface: "desktop", Component: AWDesktopScanOcr },
+      { slug: "desktop-scan-results", title: "Desktop · scan (results)", surface: "desktop", Component: AWDesktopScanResults },
+      { slug: "desktop-paste-empty", title: "Desktop · paste (empty)", surface: "desktop", Component: AWDesktopPasteEmpty },
+      { slug: "desktop-paste-parsed", title: "Desktop · paste (parsed)", surface: "desktop", Component: AWDesktopPasteParsed },
+      { slug: "desktop-buffer-overlay", title: "Desktop · buffer overlay", surface: "desktop", Component: AWDesktopBufferOverlay },
+      { slug: "mobile-type", title: "Mobile · type tab", surface: "mobile", Component: AWMobileType },
+      { slug: "mobile-scan-empty", title: "Mobile · scan (empty)", surface: "mobile", Component: AWMobileScanEmpty },
+      { slug: "mobile-scan-ocr", title: "Mobile · scan (OCR running)", surface: "mobile", Component: AWMobileScanOcr },
+      { slug: "mobile-scan-results", title: "Mobile · scan (results)", surface: "mobile", Component: AWMobileScanResults },
+      { slug: "mobile-paste-empty", title: "Mobile · paste (empty)", surface: "mobile", Component: AWMobilePasteEmpty },
+      { slug: "mobile-paste-parsed", title: "Mobile · paste (parsed)", surface: "mobile", Component: AWMobilePasteParsed },
+      { slug: "mobile-buffer-overlay", title: "Mobile · buffer overlay", surface: "mobile", Component: AWMobileBufferOverlay },
     ],
   },
 ];

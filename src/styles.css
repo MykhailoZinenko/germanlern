@@ -132,6 +132,9 @@
   --chip-h-mobile: 22px;
   --card-radius-mobile: 16px;
 
+  /* ── Study (st/) ── */
+  --study-configure-max-w: 480px;
+
   /* ── Add Word (aw/) ── */
   --aw-modal-w: 632px;
   --aw-modal-h: 560px;

@@ -1,3 +1,5 @@
+import { Sparkles } from 'lucide-react'
+
 import { Button } from '#/components/ui/button'
 import {
   Dialog,
@@ -24,20 +26,28 @@ function OverlayContent() {
   }
 
   return (
-    <div>
-      <div className="mb-5 lg:mb-[var(--space-8)]">
-        <p className="mb-1 font-heading text-sm font-medium text-[var(--text-primary)] lg:mb-2 lg:text-xl">
-          {bufferCount} unverified word{bufferCount !== 1 ? 's' : ''}
-        </p>
-        <p className="text-xs text-[var(--text-muted)] lg:text-base">
-          Verify before studying or browsing.
-        </p>
+    <div className="flex flex-col items-center text-center">
+      <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-[var(--lumi-light)]">
+        <Sparkles className="size-6 text-[var(--lumi-deep)]" />
       </div>
-      <div className="space-y-2 lg:space-y-4">
-        <Button className="h-[var(--btn-h-mobile)] w-full rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg" onClick={handleVerify}>
+      <h3 className="mb-2 font-heading text-xl font-semibold text-[var(--text-primary)]">
+        {bufferCount} unverified word{bufferCount !== 1 ? 's' : ''}
+      </h3>
+      <p className="mb-6 text-sm text-[var(--text-muted)]">
+        Verify before studying or browsing.
+      </p>
+      <div className="flex w-full flex-col gap-3">
+        <Button
+          className="h-10 w-full text-sm font-medium"
+          onClick={handleVerify}
+        >
           Verify now
         </Button>
-        <Button variant="outline" className="h-[var(--btn-h-mobile)] w-full rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg" onClick={handleAddMore}>
+        <Button
+          variant="outline"
+          className="h-10 w-full border-[var(--action-secondary-border)] text-sm font-medium text-[var(--action-secondary-text)]"
+          onClick={handleAddMore}
+        >
           Add more words
         </Button>
       </div>
@@ -54,7 +64,7 @@ export function VerifyOverlay() {
         showCloseButton={false}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
-        className="rounded-[var(--card-radius-mobile)] px-7 py-8 lg:w-[var(--vf-overlay-w)] lg:max-w-[var(--vf-overlay-w)] lg:rounded-[var(--vf-card-radius)] lg:px-[var(--vf-content-px)] lg:py-[var(--vf-card-py)]"
+        className="w-[400px] max-w-[400px] rounded-[var(--radius-2xl)] px-6 py-8"
       >
         <DialogTitle className="sr-only">Unverified words</DialogTitle>
         <DialogDescription className="sr-only">

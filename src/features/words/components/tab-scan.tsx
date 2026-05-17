@@ -13,7 +13,7 @@ export function TabScan() {
         <span className="text-xs text-[var(--text-muted)] lg:text-sm">Coming soon</span>
       </div>
       {/* Btn: same as tab-type */}
-      <Button className="h-[var(--btn-h-mobile)] w-full rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg" disabled>
+      <Button className="h-[var(--btn-h-mobile)] w-full text-xs lg:h-[var(--btn-h-desktop)] lg:text-lg" disabled>
         Capture
       </Button>
       {/* fs=10→mob 11→text-xs, desk 18→text-base */}

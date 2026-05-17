@@ -56,7 +56,7 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className="h-11 gap-3 rounded-[var(--radius-md)] px-3 text-sm"
+                      className="h-11 gap-3 px-3 text-sm"
                     >
                       <Link to={item.path}>
                         <item.icon className="size-5" />

@@ -271,8 +271,8 @@ export function DesktopShell({
     <div
       data-screen-viewport="desktop"
       style={{
-        width: wfViewport.desktop.w,
-        height: wfViewport.desktop.h,
+        width: "100%",
+        height: "100%",
         display: "flex",
         background: C.surface.page,
         color: C.text.primary,
@@ -299,6 +299,7 @@ export function DesktopShell({
             minHeight: 0,
             overflow: contentScroll ? "auto" : "hidden",
             display: contentScroll ? "block" : "flex",
+            position: "relative",
           }}
         >
           {children}
@@ -454,8 +455,8 @@ export function MobileShell({
     <div
       data-screen-viewport="mobile"
       style={{
-        width: wfViewport.mobile.w,
-        height: wfViewport.mobile.h,
+        width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         background: C.surface.page,
@@ -469,7 +470,7 @@ export function MobileShell({
     >
       <BrowserChromePlaceholder edge="top" label="Browser URL bar" />
       {topbar}
-      <main style={{ flex: 1, overflow: "auto", minHeight: 0 }}>{children}</main>
+      <main style={{ flex: 1, overflow: "auto", minHeight: 0, position: "relative" }}>{children}</main>
       <MobileBottomNav active={active} />
       <BrowserChromePlaceholder edge="bottom" label="Browser controls" />
       {showCompanionMini && (

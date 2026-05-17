@@ -87,9 +87,7 @@ export function TabType() {
   }
 
   return (
-    /* Fld mb=8→mob 9→8, desk 14→16. Second Fld mb=10→mob 11→12, desk 18→16 */
-    <div className="space-y-2 lg:space-y-4">
-      {/* Fld: h=38→mob 42→42→h-10, desk 67→68→h-[68px]; r=9→mob 10→var(--radius-lg), desk 16→var(--radius-xl); fs=12→mob 13→text-sm, desk 21→text-lg */}
+    <div className="flex flex-col gap-3">
       <Input
         ref={inputRef}
         placeholder="German word"
@@ -97,42 +95,40 @@ export function TabType() {
         onChange={(e) => setGermanWord(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
         autoFocus
-        className="h-10 rounded-[var(--radius-lg)] text-sm lg:h-[var(--field-h-desktop)] lg:rounded-[var(--radius-xl)] lg:px-6 lg:text-lg"
+        className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] text-base"
       />
       <Input
         placeholder="Translation (optional)"
         value={translation}
         onChange={(e) => setTranslation(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-        className="h-10 rounded-[var(--radius-lg)] text-sm lg:h-[var(--field-h-desktop)] lg:rounded-[var(--radius-xl)] lg:px-6 lg:text-lg"
+        className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] text-base"
       />
-      {/* collapsible text: fs=10→mob 11→text-xs, desk 18→text-base; mb=12→mob 13→12, desk 21→20 */}
       <Collapsible open={optionalOpen} onOpenChange={setOptionalOpen}>
-        <CollapsibleTrigger className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text-muted)] lg:text-sm">
-          + notes · + tags · + custom sentence
+        <CollapsibleTrigger className="cursor-pointer py-1 text-[11px] text-[var(--text-faint)] transition-colors hover:text-[var(--text-muted)]">
+          + notes · + custom sentence
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-2 lg:mt-4 lg:space-y-4">
+        <CollapsibleContent className="mt-3 flex flex-col gap-3">
           <Input
             placeholder="Notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="h-10 rounded-[var(--radius-lg)] text-sm lg:h-[var(--field-h-desktop)] lg:rounded-[var(--radius-xl)] lg:px-6 lg:text-lg"
+            className="h-10 rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] text-base"
           />
           <Textarea
             placeholder="Custom sentence"
             value={customSentence}
             onChange={(e) => setCustomSentence(e.target.value)}
-            className="min-h-16 resize-none rounded-[var(--radius-lg)] text-sm lg:min-h-20 lg:rounded-[var(--radius-xl)] lg:px-6 lg:text-lg"
+            className="min-h-16 resize-none rounded-[var(--radius-md)] border-[var(--border-subtle)] bg-[var(--surface-raised)] text-base"
           />
         </CollapsibleContent>
       </Collapsible>
-      {/* Btn: h=34→mob 37→38→h-[var(--btn-h-mobile)], desk 60→h-[60px]; r=9→same as Fld; fs=11→mob 12→text-xs, desk 19→text-lg */}
       <Button
-        className="h-[var(--btn-h-mobile)] w-full rounded-[var(--radius-lg)] text-xs lg:h-[var(--btn-h-desktop)] lg:rounded-[var(--radius-xl)] lg:text-lg"
+        className="h-10 w-full text-sm font-medium"
         onClick={handleSubmit}
         disabled={!germanWord.trim() || isPending}
       >
-        {isPending ? <Spinner className="size-4 lg:size-5" /> : 'Add word'}
+        {isPending ? <Spinner className="size-4" /> : 'Add word'}
       </Button>
     </div>
   )

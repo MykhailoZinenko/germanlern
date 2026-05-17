@@ -221,7 +221,7 @@ export function LibSearch({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className={`h-10 gap-2 rounded-[var(--radius-md)] border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--text-secondary)] ${filters.wordType ? 'bg-[var(--surface-sunken)]' : ''}`}
+                className={`h-10 gap-2 border-[var(--action-secondary-border)] px-4 text-sm font-medium text-[var(--text-secondary)] ${filters.wordType ? 'bg-[var(--surface-sunken)]' : ''}`}
               >
                 <Filter className="size-4" />
                 Filters{filters.wordType ? ` · ${filters.wordType}` : ''}
@@ -261,7 +261,7 @@ export function LibSearch({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="h-10 gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium text-[var(--text-secondary)]"
+                className="h-10 gap-2 px-4 text-sm font-medium text-[var(--text-secondary)]"
               >
                 <SlidersHorizontal className="size-4" />
                 Sort: {SORT_LABELS[filters.sort ?? 'date_added']}

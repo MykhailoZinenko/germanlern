@@ -26,7 +26,7 @@ export function AddWordDrawer() {
     <Drawer open={addOpen} onOpenChange={handleClose}>
       <DrawerContent
         showDragHandle={false}
-        className="p-0 before:inset-0 before:rounded-none before:rounded-tr-[var(--radius-lg)] before:border-b-0 before:bg-[var(--surface-page)] before:shadow-none data-[vaul-drawer-direction=bottom]:pb-[var(--shell-bottomnav-h)]"
+        className="p-0 before:inset-0 before:rounded-none before:rounded-tr-[var(--radius-xl)] before:border-b-0 before:bg-[var(--surface-page)] before:shadow-none"
       >
         <VisuallyHidden>
           <DrawerTitle>Add words</DrawerTitle>
@@ -34,9 +34,9 @@ export function AddWordDrawer() {
         <div className="absolute bottom-full left-0">
           <BookmarkTabs />
         </div>
-        <BufferBadge className="rounded-tr-[var(--radius-lg)]" />
-        <div className="mx-auto my-2.5 h-1 w-[var(--aw-drag-w)] rounded-full bg-[var(--surface-hover)]" />
-        <div className="h-[var(--aw-tab-content-h)] overflow-y-auto px-[var(--space-4)] pb-[var(--space-4)]">
+        <BufferBadge className="rounded-tr-[var(--radius-xl)]" />
+        <div className="mx-auto my-2 flex h-1 w-10 rounded-full bg-[var(--surface-hover)]" />
+        <div className="h-[420px] overflow-y-auto px-4 pb-4 pt-1">
           {activeTab === 'type' && <TabType />}
           {activeTab === 'scan' && <TabScan />}
           {activeTab === 'paste' && <TabPaste />}
